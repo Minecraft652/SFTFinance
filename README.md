@@ -8,6 +8,20 @@ SFTFinance 是一个基于Bukkit/Spigot开发的我的世界服务端插件
 
 并允许交互原链币及ERC20标准代币智能合约的代币。像 Ether , USDT
 
+## Features
+
+- 让你的服务器连接至 EVM 标准区块链（Ethereum Mainnet, Ropsten, Binance Smart Chain等）
+- 让玩家拥有自己的数字钱包，并且可以相互转账。
+- 提供基本交互 ERC20 代币智能合约，如（USDT, DAI及任何基于 ERC20 代币标准合约）的方法。
+- 管理员可以自定义玩家与服务器之间的交易，并且在区块链上执行。
+
+## Support
+
+- 支持自定义 ERC20 代币合约
+- 支持EVM 区块链及自定义区块链 HTTP 地址
+- 支持自定义管理员自定义交易对
+- 支持生成数字钱包导出到其他钱包
+
 ## Usage SFTFinance ?
 
 举个例子：A 拥有 1 SFT (ERC20 Token) 要跟 B 玩家进行转账 (Transfer method)
