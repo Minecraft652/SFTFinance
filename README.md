@@ -1,5 +1,7 @@
 # SFTFinance - Let you experience blockchain transactions in Minecraft.
 
+[查看中文说明](/readme_zh.md)
+
 ## Introduction
 
 SFTFinance Is a minecraft server plug-in based on Bukkit/Spigot
