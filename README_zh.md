@@ -29,6 +29,10 @@ SFTFinance 是一个基于Bukkit/Spigot开发的我的世界服务端插件
 - 插件目前只有在服务端关闭状态下才能进行配置
 - 配置完毕后，就可以正常使用。
 
+## Commands
+
+/wallet - 查看原链代币余额
+
 ## Usage SFTFinance ?
 
 举个例子：A 拥有 1 SFT (ERC20 Token) 要跟 B 玩家进行转账 (Transfer method)
