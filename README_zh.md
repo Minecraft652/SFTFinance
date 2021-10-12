@@ -1,5 +1,7 @@
 # SFTFinance - 让你在 Minecraft 里体验区块链上交易。
 
+[View English instructions](/README.md)
+
 ## Introducing SFTFinance
 
 SFTFinance 是一个基于Bukkit/Spigot开发的我的世界服务端插件
