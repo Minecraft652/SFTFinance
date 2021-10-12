@@ -22,6 +22,13 @@ SFTFinance 是一个基于Bukkit/Spigot开发的我的世界服务端插件
 - 支持自定义管理员自定义交易对
 - 支持生成数字钱包导出到其他钱包
 
+## Installation
+
+- 把插件放进服务端的 plugins 文件夹
+- 启动服务端，将会自动生成 config.yml 等文件
+- 插件目前只有在服务端关闭状态下才能进行配置
+- 配置完毕后，就可以正常使用。
+
 ## Usage SFTFinance ?
 
 举个例子：A 拥有 1 SFT (ERC20 Token) 要跟 B 玩家进行转账 (Transfer method)
