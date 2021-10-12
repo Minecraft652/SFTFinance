@@ -1,4 +1,4 @@
-# SFTFinance - A Ethereum linker of minecraft server plugin
+# SFTFinance - Let you experience blockchain transactions in Minecraft.
 
 ## Introduction
 
