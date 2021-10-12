@@ -1,6 +1,6 @@
 # SFTFinance - A Ethereum linker of minecraft server plugin
 
-## Introducing SFTFinance
+## Introduction
 
 SFTFinance Is a minecraft server plug-in based on Bukkit/Spigot
 
