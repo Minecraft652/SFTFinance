@@ -10,7 +10,7 @@ Tokens that allow interaction between original tokens and ERC20 standard tokens 
 
 ## Features
 
-- Connect your server to the EVM standard blockchain（Ethereum Mainnet, Ropsten, Binance Smart Chain等）
+- Connect your server to the EVM standard blockchain（Ethereum Mainnet, Ropsten, Binance Smart Chain）
 - Let players have their own crypto wallets and transfer money to each other.
 - Provide basic ways to interact with ERC20 token smart contracts such as USDT, DAI and any standard contracts based on ERC20 tokens.
 - Administrators can customize transactions between players and servers and execute them on the blockchain.
