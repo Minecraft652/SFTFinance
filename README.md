@@ -2,32 +2,32 @@
 
 ## Introducing SFTFinance
 
-SFTFinance 是一个基于Bukkit/Spigot开发的我的世界服务端插件
+SFTFinance Is a minecraft server plug-in based on Bukkit/Spigot
 
-其功能提供了让玩家及管理员在以太坊区块链及智能合约的操作
+Its features provide players and administrators with operations on the Ethereum blockchain and smart contracts
 
-并允许交互原链币及ERC20标准代币智能合约的代币。像 Ether , USDT
+Tokens that allow interaction between original tokens and ERC20 standard tokens smart contracts.(Like Ether,USDT)
 
 ## Features
 
-- 让你的服务器连接至 EVM 标准区块链（Ethereum Mainnet, Ropsten, Binance Smart Chain等）
-- 让玩家拥有自己的数字钱包，并且可以相互转账。
-- 提供基本交互 ERC20 代币智能合约，如（USDT, DAI及任何基于 ERC20 代币标准合约）的方法。
-- 管理员可以自定义玩家与服务器之间的交易，并且在区块链上执行。
+- Connect your server to the EVM standard blockchain（Ethereum Mainnet, Ropsten, Binance Smart Chain等）
+- Let players have their own crypto wallets and transfer money to each other.
+- Provide basic ways to interact with ERC20 token smart contracts such as USDT, DAI and any standard contracts based on ERC20 tokens.
+- Administrators can customize transactions between players and servers and execute them on the blockchain.
 
 ## Support
 
-- 支持自定义 ERC20 代币合约
-- 支持EVM 区块链及自定义区块链 HTTP 地址
-- 支持自定义管理员自定义交易对
-- 支持生成数字钱包导出到其他钱包
+- Support custom ERC20 token contracts.
+- Support EVM blockchain and custom blockchain HTTP address.
+- Supports custom administrators to customize transaction pairs.
+- Supports the generation of crypto wallets and export to other wallets. (Like Metamask)
 
 ## Installation
 
-- 把插件放进服务端的 plugins 文件夹
-- 启动服务端，将会自动生成 config.yml 等文件
-- 插件目前只有在服务端关闭状态下才能进行配置
-- 配置完毕后，就可以正常使用。
+- Put the plug-in into the server side's plugins folder.
+- If the server is started, files such as config.yml are automatically generated.
+- Plug-ins can only be configured when the server is off.
+- After the configuration is complete, it can be used normally.
 
 ## Usage SFTFinance ?
 
