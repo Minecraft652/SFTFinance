@@ -1,6 +1,6 @@
 # SFTFinance - Let you experience blockchain transactions in Minecraft.
 
-[查看中文说明](/readme_zh.md)
+[查看中文说明](/README_ZH.md)
 
 ## Introduction
 
