@@ -33,7 +33,17 @@ SFTFinance 是一个基于Bukkit/Spigot开发的我的世界服务端插件
 
 ## 命令
 
-/wallet - 查看原链代币余额
+/wallet - 查看钱包余额,区块链当前GasPrice。
+/wallet help - 返回帮助页面。
+/wallet blockchain - 查看当前区块链详细信息，以及已经加载的 ERC20 代币合约等。
+/wallet version - 查看插件版本。
+/wallet keys - 查看钱包的私钥，助记词。
+/wallet create - 创建一个钱包（如果没有）。
+/wallet player <玩家名称> - 查看指定玩家的钱包余额。
+/wallet exchange <交易对> - 与服务器进行交易。（需要管理员自行配置交易对）
+/wallet transfer <代币名称> <目标地址> <金额> - 向指定地址转账。燃油价格和限制均为区块链默认。
+/wallet transfer <代币名称> <目标地址> <金额> <燃油价格> - 以指定的燃油价格向指定地址转账，燃油限制为区块链默认。
+/wallet transfer <代币名称> <目标地址> <金额> <燃油价格> - 以指定的燃油价格和限制向指定地址转账。
 
 ## Usage SFTFinance ?
 
