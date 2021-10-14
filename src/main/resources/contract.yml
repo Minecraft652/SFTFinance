@@ -1,0 +1,10 @@
+SFT:
+  Address: "0x143606087fc430A7BdAB67186fdd1358dcaB1ccE" # Token contract address. 代币合约地址
+  Symbol: "SFT" # Token symbol. 代币标识
+  GasLimit: 60000 # default token gaslimit. 使用该代币的默认gaslimit
+  Decimal: 100 # if decimal length is 2,then 100,0 is 1. 该代币的小数点长度，如果是2那就填100，0就填1
+SFTT:
+  Address: "0xa0d2e41D16a3A2d55FdD7F9164D2794b6854A008"
+  Symbol: "SFTT"
+  GasLimit: 60000
+  Decimal: 1
