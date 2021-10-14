@@ -31,12 +31,16 @@ Tokens that allow interaction between original tokens and ERC20 standard tokens 
 - Plug-ins can only be configured when the server is off.
 - After the configuration is complete, it can be used normally.
 
-## Usage SFTFinance ?
+## Command
 
-举个例子：A 拥有 1 SFT (ERC20 Token) 要跟 B 玩家进行转账 (Transfer method)
-
-B 玩家未知钱包地址 , 首先 A 需要查询 B 玩家的钱包地址即使用该命令: /wallet player B
-
-查询到的 B 玩家钱包地址为 : 0x77751B52F993fD30042999F64Ed0C41A4eFa5Be8
-
-然后 A 输入该命令完成操作: /wallet transfer SFT 0x77751B52F993fD30042999F64Ed0C41A4eFa5Be8 1
+- /wallet - View wallet balance, blockchain current GasPrice.
+- /wallet help - Return to help page.
+- /wallet blockchain - View current blockchain details, loaded ERC20 token contracts, etc.
+- /wallet version - View the plug-in version.
+- /wallet keys - View wallet private key, mnemonic.
+- /wallet create - Creates a wallet (if there is one).
+- /wallet player <playername> - Check the wallet balance of the specified player.
+- /wallet exchange <transaction pair> - Transactions with the server. (The administrator needs to configure the transaction pair.)
+- /wallet transfer <token name> <address> <amount> - Gas prices and limits are blockchain defaults.
+- /wallet Transfer <token name> <address> <amount> <gasprice> - Transfer the specified gas price to the specified address, gas limit is the default blockchain.
+- /wallet Transfer <token name> <address> <amount> <gasprice> <gaslimit> - Transfer to the specified address with the specified gas price and limit.
