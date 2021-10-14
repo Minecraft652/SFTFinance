@@ -39,10 +39,10 @@ Tokens that allow interaction between original tokens and ERC20 standard tokens 
 - /wallet version - View the plug-in version.
 - /wallet keys - View wallet private key, mnemonic.
 - /wallet create - Creates a wallet (if there is one).
-- /wallet player <name> - Check the wallet balance of the specified player.
-- /wallet exchange <transaction pair> - Transactions with the server. (The administrator needs to configure the transaction pair.)
-- /wallet transfer '<name> <address> <amount>' - Gas prices and limits are blockchain defaults.
-- /wallet transfer '<name> <address> <amount> <gasprice>' - Transfer the specified gas price to the specified address, gas limit is the default blockchain.
-- /wallet transfer '<name> <address> <amount> <gasprice> <gaslimit>' - Transfer to the specified address with the specified gas price and limit.
+- /wallet player (name) - Check the wallet balance of the specified player.
+- /wallet exchange (transaction pair) - Transactions with the server. (The administrator needs to configure the transaction pair.)
+- /wallet transfer (name) (address) (amount) - Gas prices and limits are blockchain defaults.
+- /wallet transfer (name) (address) (amount) (gasprice) - Transfer the specified gas price to the specified address, gas limit is the default blockchain.
+- /wallet transfer (name) (address) (amount) (gasprice) (gaslimit) - Transfer to the specified address with the specified gas price and limit.
 
 ## Config
