@@ -46,3 +46,5 @@ SFTFinance 是一个基于Bukkit/Spigot开发的我的世界服务端插件
 - /wallet transfer <代币名称> <目标地址> <金额> <燃油价格> <燃油限制> - 以指定的燃油价格和限制向指定地址转账。
 
 ## 配置
+
+[查看默认配置文件及配置帮助](/src/main/resources/config.yml)
