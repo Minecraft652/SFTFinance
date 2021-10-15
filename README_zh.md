@@ -21,18 +21,19 @@ SFTFinance 是一个基于Bukkit/Spigot开发的我的世界服务端插件
 
 ## 功能
 
-- 让你的服务器连接至 EVM 标准区块链（Ethereum Mainnet, Ropsten, Binance Smart Chain等）
+- 让你的服务器连接至兼容 EVM 的区块链（Ethereum Mainnet, Binance Smart Chain）等测试网链。
 - 让玩家拥有自己的数字钱包，并且可以相互转账。
 - 提供基本交互 ERC20 代币智能合约，如（USDT, DAI及任何基于 ERC20 代币标准合约）的方法。
 - 管理员可以自定义交易对，让玩家与服务器进行交互，并且在区块链上执行。
 
 ## 支持
 
-- 支持自定义 ERC20 代币合约
-- 支持EVM 区块链及自定义区块链 HTTP 地址
-- 支持管理员自定义交易对
-- 支持生成数字钱包导出到其他钱包
-- 支持多个代币合约和交易对
+- 支持自定义 ERC20 代币合约。
+- 支持兼容 EVM 的区块链及自定义区块链 HTTP 地址。
+- 支持管理员自定义交易对。
+- 支持生成数字钱包导出到其他钱包。
+- 支持多个代币合约和交易对。
+- 暂不支持 RPC 连接区块链。
 
 ## 安装
 
@@ -43,7 +44,7 @@ SFTFinance 是一个基于Bukkit/Spigot开发的我的世界服务端插件
 
 ## 命令
 
-- /wallet - 查看钱包余额,区块链当前GasPrice。
+- /wallet - 查看钱包余额,区块链当前 GasPrice 。
 - /wallet help - 返回帮助页面。
 - /wallet blockchain - 查看当前区块链详细信息，以及已经加载的 ERC20 代币合约等。
 - /wallet version - 查看插件版本。
