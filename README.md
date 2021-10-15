@@ -12,7 +12,7 @@ Tokens that allow interaction between original tokens and ERC20 standard tokens 
 
 ## End User License Agreement
 
-To use SFTFinance (hereinafter referred to as this software) you need to agree to the following agreements:
+To use SFTFinance (hereinafter referred to as this software),(author is https://github.com/Minecraft652) you need to agree to the following agreements:
 
 - The player wallet data of this software is the user's personal privacy data.
 - Using this software, all operations are caused by personal, such as asset loss the author does not assume any responsibility.
