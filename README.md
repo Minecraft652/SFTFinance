@@ -59,7 +59,9 @@ To use SFTFinance (hereinafter referred to as this software) you need to agree t
 ## Configuration
 
 [View main configuration files and configuration help](/src/main/resources/config.yml)
+
 [View transaction pairs configuration files and configuration help](/src/main/resources/exchange.yml)
+
 [View the ERC20 token contract configuration file and configuration help](/src/main/resources/contract.yml)
 
 ## Environment
@@ -92,4 +94,4 @@ Operating system :
 - I am Minecraft_652, a programmer who loves learning and is committed to network decentralization.
 - Thank you very much for your support! My contact information is as follows:
 - QQ : 919899140 , Telegram : https://t.me/SIXFIVETWO
-- ENJOY TO USE!
+- ENJOY TO USE! :Smile
