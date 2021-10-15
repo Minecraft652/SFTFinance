@@ -65,11 +65,18 @@ SFTFinance 是一个基于Bukkit/Spigot开发的我的世界服务端插件
 
 ## 环境
 
-以下是测试本插件的开发环境
+本插件没有绝对的版本界限，使用 spigot-1.17 api 进行开发
+
+以下是测试本插件的开发环境（原生支持环境）
+
+如果出现 bug 等问题请在 Issues 给我提出。
+
+除以下环境外的其他版本出现 bug 问题可以联系我协助处理。
 
 Java 版本 :
 
 - Java(TM) SE Runtime Environment (build 1.8.0_231-b11)
+- Java(TM) SE Runtime Environment 18.9 (build 11.0.12+8-LTS-237)
 
 Spigot 版本 : 
 
