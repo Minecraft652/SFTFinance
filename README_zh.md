@@ -62,3 +62,10 @@ SFTFinance 是一个基于Bukkit/Spigot开发的我的世界服务端插件
 [查看交易对配置文件及配置帮助](/src/main/resources/exchange.yml)
 
 [查看ERC20代币合约配置文件及配置帮助](/src/main/resources/contract.yml)
+
+## 环境
+
+以下是测试本插件的开发环境
+
+- Java 版本 : Java(TM) SE Runtime Environment (build 1.8.0_231-b11)
+- Spigot 版本 : This server is running CraftBukkit version 3096-Spigot-9fb885e-296df56 (MC: 1.16.5) (Implementing API version 1.16.5-R0.1-SNAPSHOT)
