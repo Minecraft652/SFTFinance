@@ -86,3 +86,11 @@ Spigot 版本 :
 操作系统 : 
 
 - Microsoft Windows 10 2004
+
+## 作者想跟各位说的话
+
+- 这是我的第一个 Java 项目，如果您喜欢我的项目
+- 这是我的以太坊钱包地址 : 0x5b615F1a1989ee2636BfbFe471B1F66bCa16F926
+- 我是 Minecraft_652 一名热爱学习且致力于网络去中心化的程序猿。
+- 十分感谢您的支持！以下是我的联系方式：
+- QQ : 919899140 , Telegram : https://t.me/SIXFIVETWO
