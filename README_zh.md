@@ -49,5 +49,7 @@ SFTFinance 是一个基于Bukkit/Spigot开发的我的世界服务端插件
 ## 配置
 
 [查看主要配置文件及配置帮助](/src/main/resources/config.yml)
+
 [查看交易对配置文件及配置帮助](/src/main/resources/exchange.yml)
+
 [查看ERC20代币合约配置文件及配置帮助](/src/main/resources/contracts.yml)
