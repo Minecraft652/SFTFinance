@@ -17,7 +17,7 @@ To use SFTFinance (hereinafter referred to as this software) you need to agree t
 - The player wallet data of this software is the user's personal privacy data.
 - Using this software, all operations are caused by personal, such as asset loss the author does not assume any responsibility.
 - Investment is risky and operation should be cautious. Please comply with local laws and regulations when using this software.
-- The author reserves the right of final interpretation of this software, users and administrators can use this software free of charge.
+- The author reserves all rights of this software, users and administrators can use this software for free.
 
 ## Features
 
