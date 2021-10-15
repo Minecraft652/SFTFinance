@@ -1,6 +1,6 @@
 name: SFTFinance
 main: com.sixfivetwo.sftfinance.Main
-version: Test1.2
+version: Release1.0
 api-version: 1.16
 commands:
   wallet:
