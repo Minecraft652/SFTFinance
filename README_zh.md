@@ -1,5 +1,7 @@
 # SFTFinance - 让你在 Minecraft 里体验区块链上交易。
 
+![](https://s3.bmp.ovh/imgs/2021/10/55b4877df8628277.png)
+
 [View English instructions](/README.md)
 
 ## 什么是 SFTFinance
