@@ -53,6 +53,7 @@ SFTFinance 是一个基于Bukkit/Spigot开发的我的世界服务端插件
 - /wallet keys - 查看钱包的私钥，助记词。
 - /wallet create - 创建一个钱包（如果没有）。
 - /wallet player <玩家名称> - 查看指定玩家的钱包余额。
+- /wallet exchange - 查看当前服务器活跃的交易对。
 - /wallet exchange <交易对> - 与服务器进行交易。（需要管理员自行配置交易对）
 - /wallet transfer <代币名称> <目标地址> <金额> - 向指定地址转账。燃油价格和限制均为区块链默认。
 - /wallet transfer <代币名称> <目标地址> <金额> <燃油价格> - 以指定的燃油价格向指定地址转账，燃油限制为区块链默认。
