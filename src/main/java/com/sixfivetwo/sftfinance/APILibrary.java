@@ -1,50 +1,34 @@
 package com.sixfivetwo.sftfinance;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.security.SecureRandom;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
-
-import org.bitcoinj.crypto.ChildNumber;
-import org.bitcoinj.crypto.DeterministicHierarchy;
-import org.bitcoinj.crypto.DeterministicKey;
-import org.bitcoinj.crypto.HDKeyDerivation;
-import org.bitcoinj.crypto.MnemonicCode;
+import org.bitcoinj.crypto.*;
 import org.bitcoinj.wallet.DeterministicSeed;
 import org.web3j.contracts.eip20.generated.ERC20;
-import org.web3j.crypto.Credentials;
-import org.web3j.crypto.ECKeyPair;
-import org.web3j.crypto.Keys;
-import org.web3j.crypto.RawTransaction;
-import org.web3j.crypto.TransactionEncoder;
+import org.web3j.crypto.*;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameterName;
-import org.web3j.protocol.core.methods.response.EthBlockNumber;
-import org.web3j.protocol.core.methods.response.EthGasPrice;
-import org.web3j.protocol.core.methods.response.EthGetBalance;
-import org.web3j.protocol.core.methods.response.EthGetTransactionCount;
-import org.web3j.protocol.core.methods.response.EthSendTransaction;
-import org.web3j.protocol.core.methods.response.TransactionReceipt;
-import org.web3j.protocol.core.methods.response.Web3ClientVersion;
+import org.web3j.protocol.core.methods.response.*;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.tx.RawTransactionManager;
 import org.web3j.tx.TransactionManager;
 import org.web3j.tx.gas.DefaultGasProvider;
 import org.web3j.tx.gas.StaticGasProvider;
 import org.web3j.utils.Convert;
-import org.web3j.utils.Numeric;
 import org.web3j.utils.Convert.Unit;
+import org.web3j.utils.Numeric;
+
+import java.io.*;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.security.SecureRandom;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Objects;
 
 public class APILibrary {
 	final static ImmutableList<ChildNumber> BIP44_ETH_ACCOUNT_ZERO_PATH =
@@ -52,39 +36,45 @@ public class APILibrary {
 					ChildNumber.ZERO_HARDENED, ChildNumber.ZERO);
 
 	public static String getVersion() {
-		if (Main.fileconfig.getString("Language").contains("zh")) {
-			return Main.SFTInfo+"Release1.0, \u4f5c\u8005\u4fdd\u7559\u6240\u6709\u6743\u5229";
-		} else {
-			return Main.SFTInfo+"Release1.0, Author all rights reserved";
+		try {
+			if (Objects.requireNonNull(Main.fileconfig.getString("Language")).contains("zh")) {
+				return Main.SFTInfo + "Release1.1, \u4f5c\u8005\u4fdd\u7559\u6240\u6709\u6743\u5229";
+			} else {
+				return Main.SFTInfo + "Release1.1, Author all rights reserved";
+			}
+		} catch (Exception ex){
+			return Main.SFTInfo + "Release1.1, Author all rights reserved";
 		}
 	}
 
 	public static void inputStream2File(InputStream is, File file) throws IOException {
-		OutputStream os = null;
-		try {
-			os = new FileOutputStream(file);
-			int len = 0;
-			byte[] buffer = new byte[8192];
-			while ((len = is.read(buffer)) != -1) {
-				os.write(buffer, 0, len);
+			OutputStream os = null;
+			try {
+				os = new FileOutputStream(file);
+				int len;
+				byte[] buffer = new byte[8192];
+				while ((len = is.read(buffer)) != -1) {
+					os.write(buffer, 0, len);
+				}
+			} finally {
+				assert os != null;
+				os.close();
+				is.close();
 			}
-		} finally {
-			os.close();
-			is.close();
-		}
 	}
-	public static void FirstRun() {
+	public static boolean FirstRun() {
 		try {
-			String UUID = "00000000-0000-0000-0000-000000000000";
-			String PlayerID = "CONSOLE";
-			Main.statement.executeUpdate("create table wallets (UUID string, PlayerID string, Seed string, Address string, PrivateKey string, PublicKey string)");
-			CreateWallet(UUID, PlayerID);
+			Statement statement = Main.conn.createStatement();
+			statement.executeUpdate("create table wallets (UUID string, PlayerID string, Seed string, Address string, PrivateKey string, PublicKey string)");
+			statement.close();
+			CreateWallet(Main.consoleuuid, Main.consoleid);
+			return false;
 		} catch (Exception e) {
-			return;
+			return true;
 		}
 	}
 
-	public static Web3j GetWeb3j(String HttpUrl) throws IOException, SQLException {
+	public static Web3j GetWeb3j(String HttpUrl) {
 		Web3j web3j = Web3j.build(new HttpService(HttpUrl));
 		try {
 			Web3ClientVersion clientVersion = web3j.web3ClientVersion().send();
@@ -124,23 +114,29 @@ public class APILibrary {
 		}
 	}
 
-	public static void InsertData(String UUID,String PlayerID,String Seed,String Address,String PrivateKey,String PublicKey) throws ClassNotFoundException, SQLException {
+	public static void InsertData(String UUID,String PlayerID,String Seed,String Address,String PrivateKey,String PublicKey) {
 		try {
-			Main.statement.executeUpdate("insert into wallets values("+"'"+UUID+"'"+","+"'"+PlayerID+"'"+","+"'"+Seed+"'"+","+"'"+Address+"'"+","+"'"+PrivateKey+"'"+","+"'"+PublicKey+"');");
+			PreparedStatement statement = Main.conn.prepareStatement("insert into wallets values(?,?,?,?,?,?)");
+			statement.setString(1, UUID);
+			statement.setString(2, PlayerID);
+			statement.setString(3, Seed);
+			statement.setString(4, Address);
+			statement.setString(5, PrivateKey);
+			statement.setString(6, PublicKey);
+			statement.executeUpdate();
+			statement.close();
 		} catch (SQLException ex) {
 			ex.printStackTrace();
 		}
 	}
 	
 	public static Credentials getCredential(String PrivateKey, String PublicKey) {
-		Credentials creds = Credentials.create(PrivateKey, PublicKey);
-		return creds;
+		return Credentials.create(PrivateKey, PublicKey);
 	}
 
 	public static PlayerWalletData getPlayerWallet(String playerid) {
 		try {
-			PlayerWalletData player = new PlayerWalletData(playerid);
-			return player;
+			return new PlayerWalletData(playerid);
 		} catch (Exception e) {
 			return null;
 		}
@@ -148,26 +144,22 @@ public class APILibrary {
 
 	public static ERC20 getDefaultGasERC20(ERC20ContractData erc20ContractData, PlayerWalletData playerWalletData) {
 		TransactionManager transactionmanager = new RawTransactionManager(Main.chainlibrary.web3j, playerWalletData.creds, Main.chainlibrary.chainid);
-		ERC20 TokenERC20 = ERC20.load(erc20ContractData.address, Main.chainlibrary.web3j, transactionmanager, new DefaultGasProvider());
-		return TokenERC20;
+		return ERC20.load(erc20ContractData.address, Main.chainlibrary.web3j, transactionmanager, new DefaultGasProvider());
 	}
 
 	public static ERC20 getStaticGasERC20(ERC20ContractData erc20ContractData, PlayerWalletData playerWalletData, BigInteger gasPrice, BigInteger gasLimit) {
 		TransactionManager transactionmanager = new RawTransactionManager(Main.chainlibrary.web3j, playerWalletData.creds, Main.chainlibrary.chainid);
-		ERC20 TokenERC20 = ERC20.load(erc20ContractData.address, Main.chainlibrary.web3j, transactionmanager, new StaticGasProvider(gasPrice, gasLimit));
-		return TokenERC20;
+		return ERC20.load(erc20ContractData.address, Main.chainlibrary.web3j, transactionmanager, new StaticGasProvider(gasPrice, gasLimit));
 	}
 
 	public static String getEthBanlance(String ToAddress) throws IOException {
 		EthGetBalance balanceInWei = Main.chainlibrary.web3j.ethGetBalance(ToAddress,DefaultBlockParameterName.LATEST).send();
-		String balanceInEther = Convert.fromWei(balanceInWei.getBalance().toString(), Unit.ETHER).toString();
-		return balanceInEther;
+		return Convert.fromWei(balanceInWei.getBalance().toString(), Unit.ETHER).toString();
 	}
 
 	public static BigInteger getERC20Balance(ERC20ContractData erc20ContractData, PlayerWalletData playerWalletData, String ToAddress) throws Exception {
 		ERC20 TokenERC20 = getDefaultGasERC20(erc20ContractData, playerWalletData);
-		BigInteger Balances = TokenERC20.balanceOf(ToAddress).send();
-		return Balances;
+		return TokenERC20.balanceOf(ToAddress).send();
 	}
 
 	public static String TransferETH(
@@ -175,17 +167,16 @@ public class APILibrary {
 		String ToAddress, 
 		String gasLimit, String gasPrice, 
 		String value) throws IOException {
-		EthGetTransactionCount TransationCount = Main.chainlibrary.web3j.ethGetTransactionCount(playerWalletData.creds.getAddress(), DefaultBlockParameterName.LATEST).send();
-		BigInteger nonce = TransationCount.getTransactionCount();
-		BigInteger Txvalue = Convert.toWei(value, Unit.ETHER).toBigInteger();
+		EthGetTransactionCount TransactionCount = Main.chainlibrary.web3j.ethGetTransactionCount(playerWalletData.creds.getAddress(), DefaultBlockParameterName.LATEST).send();
+		BigInteger nonce = TransactionCount.getTransactionCount();
+		BigInteger TxValue = Convert.toWei(value, Unit.ETHER).toBigInteger();
 		BigInteger TxGasLimit = new BigInteger(gasLimit);
 		BigInteger TxGasPrice = Convert.toWei(gasPrice, Unit.GWEI).toBigInteger();
-		RawTransaction rawTransaction = RawTransaction.createEtherTransaction(nonce, TxGasPrice, TxGasLimit, ToAddress, Txvalue);
+		RawTransaction rawTransaction = RawTransaction.createEtherTransaction(nonce, TxGasPrice, TxGasLimit, ToAddress, TxValue);
 		byte[] signedMessage = TransactionEncoder.signMessage(rawTransaction, playerWalletData.creds);
 		String hexValue = Numeric.toHexString(signedMessage);
 		EthSendTransaction ethSendTransaction = Main.chainlibrary.web3j.ethSendRawTransaction(hexValue).send();
-		String transactionHash = ethSendTransaction.getTransactionHash();
-		return transactionHash;
+		return ethSendTransaction.getTransactionHash();
 	}
 
 	public static TransactionReceipt TransferSFT(
@@ -197,8 +188,7 @@ public class APILibrary {
 		BigInteger TxGasPrice = Convert.toWei(gasPrice, Unit.GWEI).toBigInteger();
 		BigInteger TxGasLimit = new BigInteger(gasLimit);
 		ERC20 TokenERC20 = getStaticGasERC20(erc20ContractData, playerWalletData, TxGasPrice, TxGasLimit);
-		TransactionReceipt receipt = TokenERC20.transfer(ToAddress, TxValue).send();
-		return receipt;
+		return TokenERC20.transfer(ToAddress, TxValue).send();
 	}
 
 	public static String CheckTokenType(String Type) {
@@ -217,8 +207,7 @@ public class APILibrary {
 	public static String CheckDealType(String Type) {
 		for (Entry<String, Map<Integer, String>> DealMap : Main.ExchangeMap.entrySet()) {
 			if(Type.equals(DealMap.getKey())) {
-				String DealType = DealMap.getKey();
-				return DealType;
+				return DealMap.getKey();
 			}
 		}
 		return null;
@@ -230,7 +219,7 @@ public class APILibrary {
 		Credentials creds, String FromAddress, 
 		String ToAddress, String gasLimit, 
 		String gasPrice, String value, boolean Type) {
-		if(Type == true) {
+		if(Type) {
 			try {
 				BigInteger FromCurrentBalance = Main.chainlibrary.web3j.ethGetBalance(FromAddress, DefaultBlockParameterName.LATEST).send().getBalance();
 				BigInteger ToCurrentBalance = Main.chainlibrary.web3j.ethGetBalance(ToAddress, DefaultBlockParameterName.LATEST).send().getBalance();

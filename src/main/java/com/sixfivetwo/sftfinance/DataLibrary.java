@@ -1,15 +1,15 @@
 
 package com.sixfivetwo.sftfinance;
 
-import java.io.IOException;
-import java.math.BigInteger;
-import java.sql.ResultSet;
-import java.util.Map;
-
 import org.web3j.crypto.Credentials;
 import org.web3j.protocol.Web3j;
 import org.web3j.utils.Convert;
 import org.web3j.utils.Convert.Unit;
+
+import java.math.BigInteger;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.Map;
 
 class BlockchainData {
     public String chainname;
@@ -17,7 +17,7 @@ class BlockchainData {
     public Long chainid;
     public String symbol;
     public Web3j web3j;
-    BlockchainData(String chainname, String httpurl, long chainid, String symbol) throws Exception {
+    BlockchainData(String chainname, String httpurl, long chainid, String symbol) {
         this.chainname = chainname;
         this.httpurl = httpurl;
         this.chainid = chainid;
@@ -34,10 +34,13 @@ class PlayerWalletData {
     public Credentials creds;
     public String seed;
     public boolean has;
-    PlayerWalletData(String playerid) throws Exception {
-        this.playerid = playerid;
-        ResultSet rs = Main.statement.executeQuery("select * from wallets where PlayerID = "+"'"+playerid+"';");
+    public boolean error = false;
+    PlayerWalletData(String playerid) {
         try {
+            this.playerid = playerid;
+            PreparedStatement statement = Main.conn.prepareStatement("select * from wallets where PlayerID = ?;");
+            statement.setString(1, playerid);
+            ResultSet rs = statement.executeQuery();
             while (rs.next()) {
                 privatekey = rs.getString("PrivateKey");
                 publickey = rs.getString("PublicKey");
@@ -45,6 +48,7 @@ class PlayerWalletData {
                 seed = rs.getString("Seed");
             }
             rs.close();
+            statement.close();
             creds = APILibrary.getCredential(privatekey, publickey);
             if (fromaddress.equals("null")) {
                 has = false;
@@ -52,6 +56,7 @@ class PlayerWalletData {
             has = true;
         } catch (Exception ex) {
             has = false;
+            error = true;
         }
     }
 }
@@ -62,14 +67,19 @@ class ERC20ContractData {
     public String gaslimit;
     public String decimal;
     public String gasrequire;
-    ERC20ContractData(Map<Integer, String> FileMap) throws IOException {
-        address = FileMap.get(1);
-        symbol = FileMap.get(2);
-        gaslimit = FileMap.get(3);
-        decimal = FileMap.get(4);
-        BigInteger gasprice = Main.chainlibrary.web3j.ethGasPrice().send().getGasPrice();
-        BigInteger biggaslimit = new BigInteger(gaslimit);
-        gasrequire = Convert.fromWei(gasprice.multiply(biggaslimit).toString(), Unit.ETHER).toString();
+    public boolean error;
+    ERC20ContractData(Map<Integer, String> FileMap) {
+        try {
+            address = FileMap.get(1);
+            symbol = FileMap.get(2);
+            gaslimit = FileMap.get(3);
+            decimal = FileMap.get(4);
+            BigInteger gasprice = Main.chainlibrary.web3j.ethGasPrice().send().getGasPrice();
+            BigInteger biggaslimit = new BigInteger(gaslimit);
+            gasrequire = Convert.fromWei(gasprice.multiply(biggaslimit).toString(), Unit.ETHER).toString();
+        } catch (Exception ex) {
+            error = true;
+        }
     }
 }
 
@@ -77,7 +87,7 @@ class ExchangeData {
     public String tokentype;
     public String price;
     public String executecommand;
-    ExchangeData(Map<Integer, String> FileMap) throws IOException {
+    ExchangeData(Map<Integer, String> FileMap) {
         tokentype = FileMap.get(1);
         price = FileMap.get(2);
         executecommand = FileMap.get(3);

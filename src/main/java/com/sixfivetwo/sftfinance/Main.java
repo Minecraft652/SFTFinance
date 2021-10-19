@@ -1,23 +1,27 @@
 package com.sixfivetwo.sftfinance;
 
-import java.io.File;
-import java.io.InputStream;
-import java.sql.*;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
-
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
+import java.io.InputStream;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Properties;
+
 
 public class Main extends JavaPlugin {
+	final static String consoleuuid = "00000000-0000-0000-0000-000000000000";
+	final static String consoleid = "CONSOLE";
 	final static String SFTInfo = "\u00a7a[\u00a76SFT\u00a7cFinance\u00a7a] \u00a7r";
 	final static String Thanks = "\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\nThank you for using SFTFinance,It is my first java project\nIf you want to support me,This is my ethereum address : 0x5b615F1a1989ee2636BfbFe471B1F66bCa16F926\nSupport link: https://github.com/Minecraft652/SFTFinance\nI would love to be your friend!Enjoy your use![Smile]\nDear ServerManager \u2014\u2014 Minecraft_652\n\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014";
-	final static String Thankszh = "\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\n\u611f\u8c22\u60a8\u4f7f\u7528 SFTFinance,\u8fd9\u662f\u6211\u7684\u7b2c\u4e00\u4e2aJava\u9879\u76ee\n\u5982\u679c\u60a8\u60f3\u652f\u6301\u6211\u4e00\u4e0b,\u8fd9\u662f\u6211\u7684\u4ee5\u592a\u574a\u5730\u5740 : 0x5b615F1a1989ee2636BfbFe471B1F66bCa16F926\n\u652f\u6301\u94fe\u63a5 : https://github.com/Minecraft652/SFTFinance\n\u6211\u5f88\u4e50\u610f\u8ddf\u4f60\u4ea4\u670b\u53cb\uff01\u4eab\u53d7SFTFinance\u5427[\u5fae\u7b11]\n\u4eb2\u7231\u7684\u670d\u52a1\u5668\u7ba1\u7406\u5458 \u2014\u2014 Minecraft_652\n\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014";
-	public static Statement statement;
+	final static String ThanksZh = "\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\n\u611f\u8c22\u60a8\u4f7f\u7528 SFTFinance,\u8fd9\u662f\u6211\u7684\u7b2c\u4e00\u4e2aJava\u9879\u76ee\n\u5982\u679c\u60a8\u60f3\u652f\u6301\u6211\u4e00\u4e0b,\u8fd9\u662f\u6211\u7684\u4ee5\u592a\u574a\u5730\u5740 : 0x5b615F1a1989ee2636BfbFe471B1F66bCa16F926\n\u652f\u6301\u94fe\u63a5 : https://github.com/Minecraft652/SFTFinance\n\u6211\u5f88\u4e50\u610f\u8ddf\u4f60\u4ea4\u670b\u53cb\uff01\u4eab\u53d7SFTFinance\u5427[\u5fae\u7b11]\n\u4eb2\u7231\u7684\u670d\u52a1\u5668\u7ba1\u7406\u5458 \u2014\u2014 Minecraft_652\n\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014";
+	public static Connection conn;
 	public static Properties prop;
 	public static BlockchainData chainlibrary;
 	public static FileConfiguration fileconfig;
@@ -26,6 +30,7 @@ public class Main extends JavaPlugin {
 	public static Map<String, Map<Integer, String>> ERC20ContractMap;
 	public static Map<String, Map<Integer, String>> ExchangeMap;
 	public static PlayerWalletData ConsoleWallet;
+
 	public void onEnable() {
 
 		try {
@@ -84,8 +89,7 @@ public class Main extends JavaPlugin {
 			prop.load(in);
 
 			Class.forName("org.sqlite.JDBC");
-			Connection conn = DriverManager.getConnection("jdbc:sqlite:"+walletfile.toString());
-			statement = conn.createStatement();
+			conn = DriverManager.getConnection("jdbc:sqlite:"+walletfile.toString());
 
 			APILibrary.FirstRun();
 			chainlibrary = new BlockchainData(fileconfig.getString("ChainName"), fileconfig.getString("HttpUrl"), fileconfig.getLong("ChainID"), fileconfig.getString("Symbol"));
@@ -95,10 +99,10 @@ public class Main extends JavaPlugin {
 				Bukkit.getServer().getPluginManager().registerEvents(new SFTListener(),this);
 			}
 
-			Bukkit.getPluginCommand("wallet").setExecutor(new SFTCommand());
+			Objects.requireNonNull(Bukkit.getPluginCommand("wallet")).setExecutor(new SFTCommand());
 
-			if (fileconfig.getString("Language").contains("zh")) {
-				System.out.println(Thankszh);
+			if (Objects.requireNonNull(fileconfig.getString("Language")).contains("zh")) {
+				System.out.println(ThanksZh);
 			} else {
 				System.out.println(Thanks);
 			}
@@ -111,8 +115,8 @@ public class Main extends JavaPlugin {
 	}
 
 	public void onDisable() {
-		if (fileconfig.getString("Language").contains("zh")) {
-			System.out.println(Thankszh);
+		if (Objects.requireNonNull(fileconfig.getString("Language")).contains("zh")) {
+			System.out.println(ThanksZh);
 		} else {
 			System.out.println(Thanks);
 		}
