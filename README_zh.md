@@ -1,6 +1,6 @@
 # SFTFinance - 让你在 Minecraft 里体验区块链上交易。
 
-![](/banner.png)
+![](/bannerzh.png)
 
 [View English instructions](/README.md)
 
