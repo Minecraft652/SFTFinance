@@ -51,7 +51,6 @@ To use SFTFinance (hereinafter referred to as this software),(author is https://
 - /wallet help (page) - See the SFTFinance command help.
 - /wallet version - View the current plugin version.
 - /wallet blockchain - View details of the currently connected blockchain.
-- /wallet version - View the plug-in version.
 - /wallet keys - View your wallet mnemonics, keys, etc.
 - /wallet create - Create a wallet (if you don't have one).
 - /wallet gas - View default Gas limits, prices, etc.
