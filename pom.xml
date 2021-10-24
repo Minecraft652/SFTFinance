@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.sixfivetwo.sftfinance</groupId>
   <artifactId>SFTFinance</artifactId>
-  <version>Release1.1</version>
+  <version>Release1.2</version>
   <properties>
   	<maven.compiler.target>1.8</maven.compiler.target>
   	<maven.compiler.source>1.8</maven.compiler.source>
@@ -53,13 +53,13 @@
     <dependency>
         <groupId>commons-io</groupId>
         <artifactId>commons-io</artifactId>
-        <version>2.11.0</version>
+        <version>20030203.000550</version>
     </dependency>
   	<dependency>
   		<groupId>org.spigotmc</groupId>
   		<artifactId>spigot-api</artifactId>
   		<version>1.17.1-R0.1-SNAPSHOT</version>
-  		<scope>provided</scope>
+  		<scope>compile</scope>
   	</dependency>
   	<dependency>
   		<groupId>org.bitcoinj</groupId>
@@ -69,8 +69,9 @@
   	<dependency>
   		<groupId>com.google.guava</groupId>
   		<artifactId>guava</artifactId>
-  		
-  	</dependency>
+        <version>31.0.1-jre</version>
+
+    </dependency>
   	<dependency>
   		<groupId>org.xerial</groupId>
   		<artifactId>sqlite-jdbc</artifactId>
