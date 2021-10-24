@@ -18,17 +18,19 @@ import java.util.Properties;
 public class Main extends JavaPlugin {
 	final static String consoleuuid = "00000000-0000-0000-0000-000000000000";
 	final static String consoleid = "CONSOLE";
-	final static String SFTInfo = "\u00a7a[\u00a76SFT\u00a7cFinance\u00a7a] \u00a7r";
-	final static String Thanks = "\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\nThank you for using SFTFinance,It is my first java project\nIf you want to support me,This is my ethereum address : 0x5b615F1a1989ee2636BfbFe471B1F66bCa16F926\nSupport link: https://github.com/Minecraft652/SFTFinance\nI would love to be your friend!Enjoy your use![Smile]\nDear ServerManager \u2014\u2014 Minecraft_652\n\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014";
-	final static String ThanksZh = "\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\n\u611f\u8c22\u60a8\u4f7f\u7528 SFTFinance,\u8fd9\u662f\u6211\u7684\u7b2c\u4e00\u4e2aJava\u9879\u76ee\n\u5982\u679c\u60a8\u60f3\u652f\u6301\u6211\u4e00\u4e0b,\u8fd9\u662f\u6211\u7684\u4ee5\u592a\u574a\u5730\u5740 : 0x5b615F1a1989ee2636BfbFe471B1F66bCa16F926\n\u652f\u6301\u94fe\u63a5 : https://github.com/Minecraft652/SFTFinance\n\u6211\u5f88\u4e50\u610f\u8ddf\u4f60\u4ea4\u670b\u53cb\uff01\u4eab\u53d7SFTFinance\u5427[\u5fae\u7b11]\n\u4eb2\u7231\u7684\u670d\u52a1\u5668\u7ba1\u7406\u5458 \u2014\u2014 Minecraft_652\n\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014";
+	final static String SFTInfo = "§a[§6SFT§cFinance§a] §r";
+	final static String Thanks = "————————————————\nThank you for using SFTFinance,It is my first java project\nIf you want to support me,This is my ethereum address : 0x5b615F1a1989ee2636BfbFe471B1F66bCa16F926\nSupport link: https://github.com/Minecraft652/SFTFinance\nI would love to be your friend!Enjoy your use![Smile]\nDear ServerManager —— Minecraft_652n————————————————";
+	final static String ThanksZh = "————————————————\n感谢您使用 SFTFinance,这是我的第一个Java项目\n如果您想支持我一下,这是我的以太坊地址 : 0x5b615F1a1989ee2636BfbFe471B1F66bCa16F926 \n支持链接 : https://github.com/Minecraft652/SFTFinance\n我很乐意跟你交朋友！享受SFTFinance吧[微笑]\n亲爱的服务器管理员 —— Minecraft_652\n——————————————";
 	public static Connection conn;
 	public static Properties prop;
 	public static BlockchainData chainlibrary;
 	public static FileConfiguration fileconfig;
 	public static FileConfiguration fileexchange;
 	public static FileConfiguration filecontract;
+	public static FileConfiguration filehelp;
 	public static Map<String, Map<Integer, String>> ERC20ContractMap;
 	public static Map<String, Map<Integer, String>> ExchangeMap;
+	public static Map<String, Map<Integer, String>> HelpPageMap;
 	public static PlayerWalletData ConsoleWallet;
 
 	public void onEnable() {
@@ -36,20 +38,33 @@ public class Main extends JavaPlugin {
 		try {
 			ERC20ContractMap = new HashMap<String, Map<Integer, String>>();
 			ExchangeMap = new HashMap<String, Map<Integer, String>>();
+			HelpPageMap = new HashMap<String, Map<Integer, String>>();
 			Map<String, File> FileMaps = new HashMap<String, File>();
 			Map<String, InputStream> InternalFileMaps = new HashMap<String, InputStream>();
 			File configfile = new File(getDataFolder(), "config.yml");
 			File exchangefile = new File(getDataFolder(), "exchange.yml");
 			File contractfile = new File(getDataFolder(), "contract.yml");
 			File walletfile = new File(getDataFolder(), "wallets.db");
+			File zhhelpfile = new File(getDataFolder(), "help_zh_CN.yml");
+			File enhelpfile = new File(getDataFolder(), "help_en_US.yml");
+			File zhlanfile = new File(getDataFolder(), "zh_CN.properties");
+			File enlanfile = new File(getDataFolder(), "en_US.properties");
 			FileMaps.put("config.yml", configfile);
 			FileMaps.put("exchange.yml", exchangefile);
 			FileMaps.put("contract.yml", contractfile);
 			FileMaps.put("wallets.db", walletfile);
+			FileMaps.put("help_zh_CN.yml", zhhelpfile);
+			FileMaps.put("help_en_US.yml", enhelpfile);
+			FileMaps.put("zh_CN.properties", zhlanfile);
+			FileMaps.put("en_US.properties", enlanfile);
 			InternalFileMaps.put("config.yml", getResource("config.yml"));
 			InternalFileMaps.put("exchange.yml", getResource("exchange.yml"));
 			InternalFileMaps.put("contract.yml", getResource("contract.yml"));
 			InternalFileMaps.put("wallets.db", getResource("wallets.db"));
+			InternalFileMaps.put("help_zh_CN.yml", getResource("help_zh_CN.yml"));
+			InternalFileMaps.put("help_en_US.yml", getResource("help_en_US.yml"));
+			InternalFileMaps.put("zh_CN.properties", getResource("zh_CN.properties"));
+			InternalFileMaps.put("en_US.properties", getResource("en_US.properties"));
 
 			if (!getDataFolder().exists()) {
 				getDataFolder().mkdir();
@@ -84,9 +99,46 @@ public class Main extends JavaPlugin {
 				ExchangeMap.put(exchangeroot, FileMapExchange);
 			}
 
+			if (Objects.requireNonNull(fileconfig.getString("Language")).contains("zh")) {
+				filehelp = YamlConfiguration.loadConfiguration(zhhelpfile);
+				for (String helproot : filehelp.getKeys(false)) {
+					Map<Integer, String> FileMapHelp = new HashMap<Integer, String>();
+					FileMapHelp.put(1, filehelp.getString(helproot + ".front"));
+					FileMapHelp.put(2, filehelp.getString(helproot + ".comment1"));
+					FileMapHelp.put(3, filehelp.getString(helproot + ".comment2"));
+					FileMapHelp.put(4, filehelp.getString(helproot + ".comment3"));
+					FileMapHelp.put(5, filehelp.getString(helproot + ".comment4"));
+					FileMapHelp.put(6, filehelp.getString(helproot + ".comment5"));
+					FileMapHelp.put(7, filehelp.getString(helproot + ".comment6"));
+					FileMapHelp.put(8, filehelp.getString(helproot + ".comment7"));
+					FileMapHelp.put(9, filehelp.getString(helproot + ".comment8"));
+					FileMapHelp.put(10, filehelp.getString(helproot + ".comment9"));
+					FileMapHelp.put(11, filehelp.getString(helproot + ".comment10"));
+					HelpPageMap.put(helproot, FileMapHelp);
+				}
+			} else {
+				filehelp = YamlConfiguration.loadConfiguration(enhelpfile);
+				for (String helproot : filehelp.getKeys(false)) {
+					Map<Integer, String> FileMapHelp = new HashMap<Integer, String>();
+					FileMapHelp.put(1, filehelp.getString(helproot + ".front"));
+					FileMapHelp.put(2, filehelp.getString(helproot + ".comment1"));
+					FileMapHelp.put(3, filehelp.getString(helproot + ".comment2"));
+					FileMapHelp.put(4, filehelp.getString(helproot + ".comment3"));
+					FileMapHelp.put(5, filehelp.getString(helproot + ".comment4"));
+					FileMapHelp.put(6, filehelp.getString(helproot + ".comment5"));
+					FileMapHelp.put(7, filehelp.getString(helproot + ".comment6"));
+					FileMapHelp.put(8, filehelp.getString(helproot + ".comment7"));
+					FileMapHelp.put(9, filehelp.getString(helproot + ".comment8"));
+					FileMapHelp.put(10, filehelp.getString(helproot + ".comment9"));
+					FileMapHelp.put(11, filehelp.getString(helproot + ".comment10"));
+					HelpPageMap.put(helproot, FileMapHelp);
+				}
+			}
+
 			prop = new Properties();
-			InputStream in = Main.class.getClassLoader().getResourceAsStream(fileconfig.getString("Language"));
+			InputStream in = getResource(Objects.requireNonNull(fileconfig.getString("Language")));
 			prop.load(in);
+
 
 			Class.forName("org.sqlite.JDBC");
 			conn = DriverManager.getConnection("jdbc:sqlite:"+walletfile.toString());
@@ -109,8 +161,8 @@ public class Main extends JavaPlugin {
 
 			System.out.println(APILibrary.getVersion());
 
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (Exception ex) {
+			ex.printStackTrace();
 		}
 	}
 
