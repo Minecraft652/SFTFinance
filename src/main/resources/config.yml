@@ -1,5 +1,5 @@
 Version: Release1.1 #Version. 版本号
-Language: en_US.properties #LanguageFile,Support English and chinese,chinese is zh_CN.properties. 语言文件，支持英文和中文，中文填 zh_CN.properties
+Language: zh_CN.properties #LanguageFile,Support English and chinese,chinese is zh_CN.properties. 语言文件，支持英文和中文，中文填 zh_CN.properties
 HttpUrl: https://data-seed-prebsc-1-s1.binance.org:8545/ #blockchain httpurl. 区块链的HTTP和端口连接
 Symbol: BNB #NaiveToken Symbol. 原链代币的标志
 ChainName: "Binance Smart Chain Testnet" #chainname 链名
