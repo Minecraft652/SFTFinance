@@ -46,18 +46,23 @@ To use SFTFinance (hereinafter referred to as this software),(author is https://
 
 ## Command
 
-- /wallet - View wallet balance, blockchain current GasPrice.
-- /wallet help - Return to help page.
-- /wallet blockchain - View current blockchain details, loaded ERC20 token contracts, etc.
+- /wallet - View your wallet address, balance.
+- /wallet help - See the SFTFinance command help.
+- /wallet help (page) - See the SFTFinance command help.
+- /wallet version - View the current plugin version.
+- /wallet blockchain - View details of the currently connected blockchain.
 - /wallet version - View the plug-in version.
-- /wallet keys - View wallet private key, mnemonic.
-- /wallet create - Creates a wallet (if there is one).
-- /wallet player (name) - Check the wallet balance of the specified player.
-- /wallet exchange - View avaliable transaction pair are active with the server.
+- /wallet keys - View your wallet mnemonics, keys, etc.
+- /wallet create - Create a wallet (if you don't have one).
+- /wallet gas - View default Gas limits, prices, etc.
+- /wallet delete - Delete the current wallet.
+- /wallet player (name) - View the specified player's wallet address, balance.
+- /wallet exchange - View the currently active deals.
 - /wallet exchange (transaction pair) - Transactions with the server. (The administrator needs to configure the transaction pair.)
-- /wallet transfer (name) (address) (amount) - Gas prices and limits are blockchain defaults.
-- /wallet transfer (name) (address) (amount) (gasprice) - Transfer the specified gas price to the specified address, gas limit is default.
-- /wallet transfer (name) (address) (amount) (gasprice) (gaslimit) - Transfer to the specified address with the specified gas price and limit.
+- /wallet exchange (transaction pair) info - View this deal details.
+- /wallet transfer (name) (address) (amount) - Sends the specified token to the destination address.
+- /wallet transfer (name) (address) (amount) (gasprice) - Sends tokens to target addresses for specified gas prices.
+- /wallet transfer (name) (address) (amount) (gasprice) (gaslimit) - Sends tokens to target addresses specifying gas prices and gas limits.
 
 ## Configuration
 
