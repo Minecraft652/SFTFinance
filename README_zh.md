@@ -46,18 +46,22 @@ SFTFinance 是一个基于Bukkit/Spigot开发的我的世界服务端插件
 
 ## 命令
 
-- /wallet - 查看钱包余额,区块链当前 GasPrice 。
-- /wallet help - 返回帮助页面。
-- /wallet blockchain - 查看当前区块链详细信息，以及已经加载的 ERC20 代币合约等。
-- /wallet version - 查看插件版本。
-- /wallet keys - 查看钱包的私钥，助记词。
-- /wallet create - 创建一个钱包（如果没有）。
-- /wallet player <玩家名称> - 查看指定玩家的钱包余额。
-- /wallet exchange - 查看当前服务器活跃的交易对。
-- /wallet exchange <交易对> - 与服务器进行交易。（需要管理员自行配置交易对）
-- /wallet transfer <代币名称> <目标地址> <金额> - 向指定地址转账。燃油价格和限制均为区块链默认。
-- /wallet transfer <代币名称> <目标地址> <金额> <燃油价格> - 以指定的燃油价格向指定地址转账，燃油限制为区块链默认。
-- /wallet transfer <代币名称> <目标地址> <金额> <燃油价格> <燃油限制> - 以指定的燃油价格和限制向指定地址转账。
+- /wallet - 查看您的钱包地址,余额.
+- /wallet help - 查看SFTFinance命令帮助.
+- /wallet help <页面> - 查看SFTFinance命令帮助.
+- /wallet version - 查看当前插件版本.
+- /wallet blockchain - 查看当前连接的区块链详细信息.
+- /wallet keys - 查看您的钱包助记词，密钥等.
+- /wallet create - 创建一个钱包(前提是没有).
+- /wallet player <玩家名称> - 查看指定玩家的钱包地址,余额.
+- /wallet gas - 查看默认Gas限制,价格等设置.
+- /wallet delete - 删除当前钱包.
+- /wallet exchange - 查看当前活跃的交易对.
+- /wallet exchange <交易对> - 与管理员预设的交易对向服务器发起交易.
+- /wallet exchange <交易对> info - 查看该交易对详细信息.
+- /wallet transfer <代币名称> <目标地址> <金额> - 向目标地址发送指定代币.
+- /wallet transfer <代币名称> <目标地址> <金额> <燃油价格> - 指定燃料价格向目标地址发送代币.
+- /wallet transfer <代币名称> <目标地址> <金额> <燃油价格> <燃油限制> - 指定燃料价格和燃油限制向目标地址发送代币.
 
 ## 配置
 
