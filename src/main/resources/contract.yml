@@ -1,0 +1,10 @@
+SFT: #Token symbol. It key must = Symbol. 代币标识，必须与下面的代币标识相等
+  Address: "0x4c24CbdB2F2710D5C79ec3570B8C81E2F4D58e26" # Token contract address. 代币合约地址
+  Symbol: "SFT" # Token symbol. 代币标识
+  GasLimit: 60000 # default token gaslimit. 使用该代币的默认gaslimit
+  Decimal: 10000 # if decimal length is 2,then 100,0 is 1. 该代币的小数点长度，如果是2那就填100，0就填1
+TSF:
+  Address: "0x43BF77DdB4e452b8C12108D6E2B19c7E26762DE2"
+  Symbol: "TSF"
+  GasLimit: 60000
+  Decimal: 1

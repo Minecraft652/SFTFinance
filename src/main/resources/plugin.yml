@@ -1,0 +1,9 @@
+name: SFTFinance
+main: com.sixfivetwo.sftfinance.Main
+version: Release1.3
+api-version: 1.16
+commands:
+  wallet:
+    aliases:
+    usage: "/wallet"
+    description: "Get your wallet balances"
