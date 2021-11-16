@@ -30,6 +30,7 @@ To use SFTFinance (hereinafter referred to as this software),(author is https://
 
 ## Support
 
+- Support MySQL Database , SQLite.
 - Support custom ERC20 token contracts.
 - Support EVM compatible blockchain and custom BLOCKCHAIN HTTP address.
 - Supports administrators to customize transaction pairs.
