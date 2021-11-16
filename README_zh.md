@@ -30,6 +30,7 @@ SFTFinance 是一个基于Bukkit/Spigot开发的我的世界服务端插件
 
 ## 支持
 
+- 支持 MySQL , SQLite 数据库。
 - 支持自定义 ERC20 代币合约。
 - 支持兼容 EVM 的区块链及自定义区块链 HTTP 地址。
 - 支持管理员自定义交易对。
