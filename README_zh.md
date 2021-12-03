@@ -63,6 +63,12 @@ SFTFinance 是一个基于Bukkit/Spigot开发的我的世界服务端插件
 - /wallet transfer <代币名称> <目标地址> <金额> - 向目标地址发送指定代币.
 - /wallet transfer <代币名称> <目标地址> <金额> <燃油价格> - 指定燃料价格向目标地址发送代币.
 - /wallet transfer <代币名称> <目标地址> <金额> <燃油价格> <燃油限制> - 指定燃料价格和燃油限制向目标地址发送代币.
+- /wallet approve <代币类型> <目标地址> <数量> - 向目标地址许可使用已指定自己的ERC20代币,详情请查看Solidity-Approve方法.
+- /wallet approve <代币类型> <目标地址> <数量> <燃料价格> - 指定燃料价格,向目标地址许可使用已指定自己的ERC20代币,详情请查看Solidity-Approve方法.
+- /wallet approve <代币类型> <目标地址> <数量> <燃料价格> <燃料限制> - 指定燃料价格和限制,向目标地址许可使用已指定自己的ERC20代币,详情请查看Solidity-Approve方法.
+- /wallet transferfrom <代币类型> <付款地址> <收款地址> <数量> Solidity-Transferfrom 方法.
+- /wallet transferfrom <代币类型> <付款地址> <收款地址> <数量> <燃料价格> Solidity-Transferfrom 方法.
+- /wallet transferfrom <代币类型> <付款地址> <收款地址> <数量> <燃料价格> <燃料限制> Solidity-Transferfrom 方法.
 
 ## 配置
 
