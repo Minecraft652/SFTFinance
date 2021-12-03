@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.sixfivetwo.sftfinance</groupId>
   <artifactId>SFTFinance</artifactId>
-  <version>Release1.2</version>
+  <version>Release1.4</version>
   <properties>
   	<maven.compiler.target>1.8</maven.compiler.target>
   	<maven.compiler.source>1.8</maven.compiler.source>
