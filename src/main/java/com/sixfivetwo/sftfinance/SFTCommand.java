@@ -1,5 +1,9 @@
 package com.sixfivetwo.sftfinance;
 
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.chat.hover.content.Text;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -25,43 +29,33 @@ public class SFTCommand implements CommandExecutor {
                 if (command.getName().equals("wallet")) {
                     PlayerWalletData commander = new PlayerWalletData(commandSender.getName());
                     List<String> message = new ArrayList<>();
+                    List<TextComponent> inimsg = new ArrayList<>();
                     switch (args.length) {
                         case 0:
                             if (!commander.has) {
                                 commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("Notreg"));
                                 return;
                             }
-                            String ethbalances = String.valueOf(APILibrary.getEthBalance(commander.fromaddress, true));
-                            message.add(Main.SFTInfo + Main.prop.getProperty("YourAddress") + commander.fromaddress);
-                            message.add(Main.SFTInfo + Main.prop.getProperty("YourBalance") + ethbalances + " " + Main.chainlibrary.symbol);
+                            String balance = String.valueOf(APILibrary.getEthBalance(commander.fromaddress, true));
+                            TextComponent msg1 = new TextComponent(Main.SFTInfo + Main.prop.getProperty("YourAddress") + commander.fromaddress);
+                            TextComponent msg2 = new TextComponent(Main.SFTInfo + Main.prop.getProperty("YourBalance") + balance + " " + Main.chainlibrary.symbol);
+                            msg1.setClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, commander.fromaddress));
+                            msg1.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(Main.prop.getProperty("clicktocopy"))));
+                            msg2.setClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, commander.fromaddress));
+                            msg2.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(Main.prop.getProperty("clicktocopy"))));
+                            inimsg.add(msg1);
+                            inimsg.add(msg2);
                             for (Entry<String, Map<Integer, String>> ERC20Map : Main.ERC20ContractMap.entrySet()) {
                                 ERC20ContractData ERC20Data = new ERC20ContractData(Main.ERC20ContractMap.get(ERC20Map.getKey()));
-                                BigDecimal sftbalances = new BigDecimal(APILibrary.getERC20Balance(ERC20Data, commander, commander.fromaddress)).divide(new BigDecimal(ERC20Data.decimal));
-                                String finalsftbalances = String.valueOf(sftbalances);
-                                message.add(Main.SFTInfo + Main.prop.getProperty("YourBalance") + finalsftbalances + " " + ERC20Data.symbol);
+                                BigDecimal sftbalance = new BigDecimal(APILibrary.getERC20Balance(ERC20Data, commander, commander.fromaddress)).divide(new BigDecimal(ERC20Data.decimal));
+                                inimsg.add(new TextComponent(Main.SFTInfo + Main.prop.getProperty("YourBalance") + sftbalance + " " + ERC20Data.symbol));
                             }
-                            message.add(Main.SFTInfo + Main.prop.getProperty("HelpPage"));
-                            APILibrary.playerSendMessage(commandSender, message);
+                            inimsg.add(new TextComponent(Main.SFTInfo + Main.prop.getProperty("HelpPage")));
+                            APILibrary.playerSendInteractiveMessage(commandSender, inimsg);
                             return;
                         case 1:
                             if (args[0].equals("help")) {
-                                for (Entry<String, Map<Integer, String>> HELPMap : Main.HelpPageMap.entrySet()) {
-                                    HelpPageData HelpData = new HelpPageData(Main.HelpPageMap.get(HELPMap.getKey()));
-                                    if (HELPMap.getKey().equals("Page1")) {
-                                        message.add(HelpData.front);
-                                        message.add(HelpData.comment1);
-                                        message.add(HelpData.comment2);
-                                        message.add(HelpData.comment3);
-                                        message.add(HelpData.comment4);
-                                        message.add(HelpData.comment5);
-                                        message.add(HelpData.comment6);
-                                        message.add(HelpData.comment7);
-                                        message.add(HelpData.comment8);
-                                        message.add(HelpData.comment9);
-                                        message.add(HelpData.comment10);
-                                    }
-                                }
-                                APILibrary.playerSendMessage(commandSender, message);
+                                APILibrary.playerSendMessage(commandSender, APILibrary.getHelpData("1", message));
                                 return;
                             }
                             if (args[0].equals("version")) {
@@ -86,11 +80,17 @@ public class SFTCommand implements CommandExecutor {
                                     commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("Notreg"));
                                     return;
                                 }
-                                    message.add(Main.SFTInfo + Main.prop.getProperty("keywarning"));
-                                    message.add(Main.SFTInfo + Main.prop.getProperty("Privatekey") + commander.privatekey);
-                                    message.add(Main.SFTInfo + Main.prop.getProperty("Seed") + commander.seed);
-                                    APILibrary.playerSendMessage(commandSender, message);
-                                    return;
+                                inimsg.add(new TextComponent(Main.SFTInfo + Main.prop.getProperty("keywarning")));
+                                TextComponent msg10 = new TextComponent(Main.SFTInfo + Main.prop.getProperty("Privatekey") + commander.privatekey);
+                                TextComponent msg11 = new TextComponent(Main.SFTInfo + Main.prop.getProperty("Seed") + commander.seed);
+                                msg10.setClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, commander.privatekey));
+                                msg10.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(Main.prop.getProperty("clicktocopy"))));
+                                msg11.setClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, commander.seed));
+                                msg11.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(Main.prop.getProperty("clicktocopy"))));
+                                inimsg.add(msg10);
+                                inimsg.add(msg11);
+                                APILibrary.playerSendInteractiveMessage(commandSender, inimsg);
+                                return;
                             }
                             if (args[0].equals("create")) {
                                 if (!commander.has) {
@@ -147,43 +147,11 @@ public class SFTCommand implements CommandExecutor {
                         case 2:
                             if (args[0].equals("help")) {
                                 if (args[1].equals("1")) {
-                                    for (Entry<String, Map<Integer, String>> HELPMap : Main.HelpPageMap.entrySet()) {
-                                        HelpPageData HelpData = new HelpPageData(Main.HelpPageMap.get(HELPMap.getKey()));
-                                        if (HELPMap.getKey().equals("Page1")) {
-                                            message.add(HelpData.front);
-                                            message.add(HelpData.comment1);
-                                            message.add(HelpData.comment2);
-                                            message.add(HelpData.comment3);
-                                            message.add(HelpData.comment4);
-                                            message.add(HelpData.comment5);
-                                            message.add(HelpData.comment6);
-                                            message.add(HelpData.comment7);
-                                            message.add(HelpData.comment8);
-                                            message.add(HelpData.comment9);
-                                            message.add(HelpData.comment10);
-                                        }
-                                    }
-                                    APILibrary.playerSendMessage(commandSender, message);
+                                    APILibrary.playerSendMessage(commandSender, APILibrary.getHelpData("1", message));
                                     return;
                                 }
                                 if (args[1].equals("2")) {
-                                    for (Entry<String, Map<Integer, String>> HELPMap : Main.HelpPageMap.entrySet()) {
-                                        HelpPageData HelpData = new HelpPageData(Main.HelpPageMap.get(HELPMap.getKey()));
-                                        if (HELPMap.getKey().equals("Page2")) {
-                                            message.add(HelpData.front);
-                                            message.add(HelpData.comment1);
-                                            message.add(HelpData.comment2);
-                                            message.add(HelpData.comment3);
-                                            message.add(HelpData.comment4);
-                                            message.add(HelpData.comment5);
-                                            message.add(HelpData.comment6);
-                                            message.add(HelpData.comment7);
-                                            message.add(HelpData.comment8);
-                                            message.add(HelpData.comment9);
-                                            message.add(HelpData.comment10);
-                                        }
-                                    }
-                                    APILibrary.playerSendMessage(commandSender, message);
+                                    APILibrary.playerSendMessage(commandSender, APILibrary.getHelpData("2", message));
                                     return;
                                 }
                             }
@@ -194,15 +162,20 @@ public class SFTCommand implements CommandExecutor {
                                 }
                                 PlayerWalletData playerwallet = new PlayerWalletData(args[1]);
                                 String ethbalance = String.valueOf(APILibrary.getEthBalance(playerwallet.fromaddress, true));
-                                message.add(Main.SFTInfo + Main.prop.getProperty("TargetAddress") + playerwallet.fromaddress);
-                                message.add(Main.SFTInfo + Main.prop.getProperty("TargetBalance") + ethbalance + " " + Main.chainlibrary.symbol);
+                                TextComponent msg10 = new TextComponent(Main.SFTInfo + Main.prop.getProperty("TargetAddress") + playerwallet.fromaddress);
+                                TextComponent msg11 = new TextComponent(Main.SFTInfo + Main.prop.getProperty("TargetBalance") + ethbalance + " " + Main.chainlibrary.symbol);
+                                msg10.setClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, playerwallet.fromaddress));
+                                msg10.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(Main.prop.getProperty("clicktocopy"))));
+                                msg11.setClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, playerwallet.fromaddress));
+                                msg11.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(Main.prop.getProperty("clicktocopy"))));
+                                inimsg.add(msg10);
+                                inimsg.add(msg11);
                                 for (Entry<String, Map<Integer, String>> ERC20Map : Main.ERC20ContractMap.entrySet()) {
                                     ERC20ContractData ERC20Data = new ERC20ContractData(Main.ERC20ContractMap.get(ERC20Map.getKey()));
-                                    BigDecimal sftbalances = new BigDecimal(APILibrary.getERC20Balance(ERC20Data, commander, commander.fromaddress)).divide(new BigDecimal(ERC20Data.decimal));
-                                    String finalsftbalances = String.valueOf(sftbalances);
-                                    message.add(Main.SFTInfo + Main.prop.getProperty("TargetBalance") + finalsftbalances + " " + ERC20Data.symbol);
+                                    BigDecimal balances = new BigDecimal(APILibrary.getERC20Balance(ERC20Data, commander, commander.fromaddress)).divide(new BigDecimal(ERC20Data.decimal));
+                                    inimsg.add(new TextComponent(Main.SFTInfo + Main.prop.getProperty("TargetBalance") + balances + " " + ERC20Data.symbol));
                                 }
-                                APILibrary.playerSendMessage(commandSender, message);
+                                APILibrary.playerSendInteractiveMessage(commandSender, inimsg);
                                 return;
                             }
                             if (args[0].equals("exchange")) {
@@ -295,43 +268,12 @@ public class SFTCommand implements CommandExecutor {
                                 return;
                             }
                             if (args[0].equals("transfer")) {
-                                String Type = args[1];
-                                String ToAddress = args[2];
-                                String value = args[3];
-                                String gasPrice = String.valueOf(Main.chainlibrary.web3j.ethGasPrice().send().getGasPrice().divide(new BigInteger("1000000000")));
-                                String TokenType = APILibrary.CheckTokenType(Type);
-                                for (Entry<String, Map<Integer, String>> ERC20Map : Main.ERC20ContractMap.entrySet()) {
-                                    ERC20ContractData contractData = new ERC20ContractData(Main.ERC20ContractMap.get(ERC20Map.getKey()));
-                                    if (TokenType.equals(Main.chainlibrary.symbol)) {
-                                        String gasLimit = "21000";
-                                        if (APILibrary.CheckLegal(contractData, commander, commander.fromaddress, ToAddress, gasLimit, gasPrice, value, true)) {
-                                            commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("dispose"));
-                                            String TransactionHash = APILibrary.TransferETH(commander, ToAddress, gasLimit, gasPrice, value);
-                                            if (TransactionHash.contains("null")) {
-                                                commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("donterror"));
-                                                return;
-                                            }
-                                            commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("TransferSuccess") + "\n\u00a7a" + Main.prop.getProperty("ExplorerUrl") + TransactionHash);
-                                            return;
-                                        }
-                                    } else {
-                                        if (TokenType.equals(contractData.symbol)) {
-                                            String gasLimit = contractData.gaslimit;
-                                            if (APILibrary.CheckLegal(contractData, commander, commander.fromaddress, ToAddress, gasLimit, gasPrice, value, false)) {
-                                                commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("dispose"));
-                                                String TransactionHash = APILibrary.TransferSFT(contractData, commander, ToAddress, gasLimit, gasPrice, value).getTransactionHash();
-                                                if (TransactionHash.contains("null")) {
-                                                    commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("donterror"));
-                                                    return;
-                                                }
-                                                commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("TransferSuccess") + "\n\u00a7a" + Main.prop.getProperty("ExplorerUrl") + TransactionHash);
-                                                return;
-                                            }
-                                        }
-                                    }
-                                    commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("CheckGas"));
-                                    return;
-                                }
+                                ReceiptData rd = new ReceiptData(args[1], "null", args[2], args[3], "null", String.valueOf(Main.chainlibrary.web3j.ethGasPrice().send().getGasPrice().divide(new BigInteger("1000000000"))));
+                                if (APILibrary.executeTransfer(commander, rd, commandSender)) return;
+                            }
+                            if (args[0].equals("approve")) {
+                                ReceiptData rd = new ReceiptData(args[1], "null", args[2], args[3], "null", String.valueOf(Main.chainlibrary.web3j.ethGasPrice().send().getGasPrice().divide(new BigInteger("1000000000"))));
+                                if (APILibrary.executeApprove(commander, rd, commandSender)) return;
                             }
                         case 5:
                             if (!commander.has) {
@@ -339,43 +281,16 @@ public class SFTCommand implements CommandExecutor {
                                 return;
                             }
                             if (args[0].equals("transfer")) {
-                                String Type = args[1];
-                                String ToAddress = args[2];
-                                String value = args[3];
-                                String gasPrice = args[4];
-                                String TokenType = APILibrary.CheckTokenType(Type);
-                                for (Entry<String, Map<Integer, String>> ERC20Map : Main.ERC20ContractMap.entrySet()) {
-                                    ERC20ContractData contractData = new ERC20ContractData(Main.ERC20ContractMap.get(ERC20Map.getKey()));
-                                    if (TokenType.equals(Main.chainlibrary.symbol)) {
-                                        String gasLimit = "21000";
-                                        if (APILibrary.CheckLegal(contractData, commander, commander.fromaddress, ToAddress, gasLimit, gasPrice, value, true)) {
-                                            commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("dispose"));
-                                            String TransactionHash = APILibrary.TransferETH(commander, ToAddress, gasLimit, gasPrice, value);
-                                            if (TransactionHash.contains("null")) {
-                                                commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("donterror"));
-                                                return;
-                                            }
-                                            commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("TransferSuccess") + "\n\u00a7a" + Main.prop.getProperty("ExplorerUrl") + TransactionHash);
-                                            return;
-                                        }
-                                    } else {
-                                        if (TokenType.equals(contractData.symbol)) {
-                                            String gasLimit = contractData.gaslimit;
-                                            if (APILibrary.CheckLegal(contractData, commander, commander.fromaddress, ToAddress, gasLimit, gasPrice, value, false)) {
-                                                commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("dispose"));
-                                                String TransactionHash = APILibrary.TransferSFT(contractData, commander, ToAddress, gasLimit, gasPrice, value).getTransactionHash();
-                                                if (TransactionHash.contains("null")) {
-                                                    commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("donterror"));
-                                                    return;
-                                                }
-                                                commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("TransferSuccess") + "\n\u00a7a" + Main.prop.getProperty("ExplorerUrl") + TransactionHash);
-                                                return;
-                                            }
-                                        }
-                                    }
-                                }
-                                commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("CheckGas"));
-                                return;
+                                ReceiptData rd = new ReceiptData(args[1], "null", args[2], args[3], "null", args[4]);
+                                if (APILibrary.executeTransfer(commander, rd, commandSender)) return;
+                            }
+                            if (args[0].equals("transferfrom")) {
+                                ReceiptData rd = new ReceiptData(args[1], args[2], args[3], args[4], "null", String.valueOf(Main.chainlibrary.web3j.ethGasPrice().send().getGasPrice().divide(new BigInteger("1000000000"))));
+                                if (APILibrary.executeTransferFrom(commander, rd, commandSender)) return;
+                            }
+                            if (args[0].equals("approve")) {
+                                ReceiptData rd = new ReceiptData(args[1], "null", args[2], args[3], "null", args[4]);
+                                if (APILibrary.executeApprove(commander, rd, commandSender)) return;
                             }
                         case 6:
                             if (!commander.has) {
@@ -383,42 +298,21 @@ public class SFTCommand implements CommandExecutor {
                                 return;
                             }
                             if (args[0].equals("transfer")) {
-                                String Type = args[1];
-                                String ToAddress = args[2];
-                                String value = args[3];
-                                String gasPrice = args[4];
-                                String gasLimit = args[5];
-                                String TokenType = APILibrary.CheckTokenType(Type);
-                                for (Entry<String, Map<Integer, String>> ERC20Map : Main.ERC20ContractMap.entrySet()) {
-                                    ERC20ContractData contractData = new ERC20ContractData(Main.ERC20ContractMap.get(ERC20Map.getKey()));
-                                    if (TokenType.equals(Main.chainlibrary.symbol)) {
-                                        if (APILibrary.CheckLegal(contractData, commander, commander.fromaddress, ToAddress, gasLimit, gasPrice, value, true)) {
-                                            commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("dispose"));
-                                            String TransactionHash = APILibrary.TransferETH(commander, ToAddress, gasLimit, gasPrice, value);
-                                            if (TransactionHash.contains("null")) {
-                                                commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("donterror"));
-                                                return;
-                                            }
-                                            commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("TransferSuccess") + "\n\u00a7a" + Main.prop.getProperty("ExplorerUrl") + TransactionHash);
-                                            return;
-                                        }
-                                    } else {
-                                        if (TokenType.equals(contractData.symbol)) {
-                                            if (APILibrary.CheckLegal(contractData, commander, commander.fromaddress, ToAddress, gasLimit, gasPrice, value, false)) {
-                                                commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("dispose"));
-                                                String TransactionHash = APILibrary.TransferSFT(contractData, commander, ToAddress, gasLimit, gasPrice, value).getTransactionHash();
-                                                if (TransactionHash.contains("null")) {
-                                                    commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("donterror"));
-                                                    return;
-                                                }
-                                                commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("TransferSuccess") + "\n\u00a7a" + Main.prop.getProperty("ExplorerUrl") + TransactionHash);
-                                                return;
-                                            }
-                                        }
-                                    }
-                                }
-                                commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("CheckGas"));
-                                return;
+                                ReceiptData rd = new ReceiptData(args[1], "null", args[2], args[3], args[5], args[4]);
+                                if (APILibrary.executeTransfer(commander, rd, commandSender)) return;
+                            }
+                            if (args[0].equals("transferfrom")) {
+                                ReceiptData rd = new ReceiptData(args[1], args[2], args[3], args[4], "null", args[5]);
+                                if (APILibrary.executeTransferFrom(commander, rd, commandSender)) return;
+                            }
+                            if (args[0].equals("approve")) {
+                                ReceiptData rd = new ReceiptData(args[1], "null", args[2], args[3], args[5], args[4]);
+                                if (APILibrary.executeApprove(commander, rd, commandSender)) return;
+                            }
+                        case 7:
+                            if (args[0].equals("transferfrom")) {
+                                ReceiptData rd = new ReceiptData(args[1], args[2], args[3], args[4], args[6], args[5]);
+                                if (APILibrary.executeTransferFrom(commander, rd, commandSender)) return;
                             }
                     }
                 }

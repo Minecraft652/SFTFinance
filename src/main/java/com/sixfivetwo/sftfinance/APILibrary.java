@@ -2,14 +2,17 @@ package com.sixfivetwo.sftfinance;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bitcoinj.crypto.*;
 import org.bitcoinj.wallet.DeterministicSeed;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 import org.web3j.contracts.eip20.generated.ERC20;
 import org.web3j.crypto.*;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameterName;
+import org.web3j.protocol.core.RemoteCall;
 import org.web3j.protocol.core.methods.response.*;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.tx.RawTransactionManager;
@@ -128,6 +131,26 @@ public class APILibrary {
         }
     }
 
+    public static List<String> getHelpData(String page, List<String> message) {
+        for (Entry<String, Map<Integer, String>> HELPMap : Main.HelpPageMap.entrySet()) {
+            HelpPageData HelpData = new HelpPageData(Main.HelpPageMap.get(HELPMap.getKey()));
+            if (HELPMap.getKey().equals("Page" + page)) {
+                message.add(HelpData.front);
+                message.add(HelpData.comment1);
+                message.add(HelpData.comment2);
+                message.add(HelpData.comment3);
+                message.add(HelpData.comment4);
+                message.add(HelpData.comment5);
+                message.add(HelpData.comment6);
+                message.add(HelpData.comment7);
+                message.add(HelpData.comment8);
+                message.add(HelpData.comment9);
+                message.add(HelpData.comment10);
+            }
+        }
+        return message;
+    }
+
     public static boolean executeCommand(Player player, String command, boolean isOp) {
         player.setOp(true);
         player.chat(command);
@@ -141,15 +164,60 @@ public class APILibrary {
         }
     }
 
+    public static void playerSendInteractiveMessage(CommandSender commandSender, List<TextComponent> messageList) {
+        for (TextComponent message : messageList) {
+            commandSender.spigot().sendMessage(message);
+        }
+    }
+
+    public static boolean sendSFTTransaction(@NotNull CommandSender commandSender, PlayerWalletData commander, ReceiptData rd, ERC20ContractData contractData) throws Exception {
+        if (APILibrary.CheckLegal(contractData, commander, commander.fromaddress, rd.toAddress, rd.gasLimit, rd.gasPrice, rd.value, false)) {
+            commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("dispose"));
+            String TransactionHash = APILibrary.TransferSFT(contractData, commander, rd.toAddress, rd.gasLimit, rd.gasPrice, rd.value).getTransactionHash();
+            return checkTransactionHash(commandSender, TransactionHash);
+        }
+        return false;
+    }
+
+    public static boolean sendETHTransaction(@NotNull CommandSender commandSender, PlayerWalletData commander, ReceiptData rd, ERC20ContractData contractData) throws Exception {
+        if (APILibrary.CheckLegal(contractData, commander, commander.fromaddress, rd.toAddress, rd.gasLimit, rd.gasPrice, rd.value, true)) {
+            commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("dispose"));
+            String TransactionHash = APILibrary.TransferETH(commander, rd.toAddress, rd.gasLimit, rd.gasPrice, rd.value);
+            return checkTransactionHash(commandSender, TransactionHash);
+        }
+        return false;
+    }
+
+    public static boolean sendApproveTransaction(@NotNull CommandSender commandSender, PlayerWalletData commander, ReceiptData rd, ERC20ContractData contractData) throws Exception {
+        commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("dispose"));
+        TransactionReceipt receipt = APILibrary.approve(contractData, commander, rd.toAddress, rd.value, rd.gasPrice, rd.gasLimit);
+        return checkTransactionHash(commandSender, receipt.getTransactionHash());
+    }
+
+    public static boolean sendTransferFromTransaction(@NotNull CommandSender commandSender, PlayerWalletData commander, ReceiptData rd, ERC20ContractData contractData) throws Exception {
+        commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("dispose"));
+        TransactionReceipt receipt = APILibrary.TransferFromSFT(contractData, commander, rd.fromAddress, rd.toAddress, rd.gasLimit, rd.gasPrice, rd.value);
+        return checkTransactionHash(commandSender, receipt.getTransactionHash());
+    }
+
+    public static boolean checkTransactionHash(@NotNull CommandSender commandSender, String transactionHash) {
+        if (transactionHash.contains("null")) {
+            commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("donterror"));
+            return true;
+        }
+        commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("TransferSuccess") + "\n\u00a7a" + Main.prop.getProperty("ExplorerUrl") + transactionHash);
+        return true;
+    }
+
     public static String getVersion() {
         try {
             if (Objects.requireNonNull(Main.fileconfig.getString("Language")).contains("zh")) {
-                return Main.SFTInfo + "§a Release1.3, 作者保留所有权利";
+                return Main.SFTInfo + "§a Release1.4, 作者保留所有权利";
             } else {
-                return Main.SFTInfo + "Release1.3, Author all rights reserved";
+                return Main.SFTInfo + "Release1.4, Author all rights reserved";
             }
         } catch (Exception ex) {
-            return Main.SFTInfo + "Release1.3, Author all rights reserved";
+            return Main.SFTInfo + "Release1.4, Author all rights reserved";
         }
     }
 
@@ -196,6 +264,16 @@ public class APILibrary {
         return TokenERC20.balanceOf(ToAddress).send();
     }
 
+    public static TransactionReceipt approve(
+            ERC20ContractData erc20ContractData, PlayerWalletData playerWalletData,
+            String toAddress, String value, String gasPrice, String gasLimit) throws Exception {
+        BigInteger TxValue = new BigDecimal(value).multiply(new BigDecimal(erc20ContractData.decimal)).toBigInteger();
+        BigInteger TxGasPrice = Convert.toWei(gasPrice, Unit.GWEI).toBigInteger();
+        BigInteger TxGasLimit = new BigInteger(gasLimit);
+        ERC20 TokenERC20 = getStaticGasERC20(erc20ContractData, playerWalletData, TxGasPrice, TxGasLimit);
+        return TokenERC20.approve(toAddress, TxValue).send();
+    }
+
     public static String TransferETH(
             PlayerWalletData playerWalletData,
             String ToAddress,
@@ -223,6 +301,70 @@ public class APILibrary {
         BigInteger TxGasLimit = new BigInteger(gasLimit);
         ERC20 TokenERC20 = getStaticGasERC20(erc20ContractData, playerWalletData, TxGasPrice, TxGasLimit);
         return TokenERC20.transfer(ToAddress, TxValue).send();
+    }
+
+    public static TransactionReceipt TransferFromSFT(
+            ERC20ContractData erc20ContractData,
+            PlayerWalletData playerWalletData, String FromAddress,
+            String ToAddress, String gasLimit,
+            String gasPrice, String value) throws Exception {
+        BigInteger TxValue = new BigDecimal(value).multiply(new BigDecimal(erc20ContractData.decimal)).toBigInteger();
+        BigInteger TxGasPrice = Convert.toWei(gasPrice, Unit.GWEI).toBigInteger();
+        BigInteger TxGasLimit = new BigInteger(gasLimit);
+        ERC20 TokenERC20 = getStaticGasERC20(erc20ContractData, playerWalletData, TxGasPrice, TxGasLimit);
+        return TokenERC20.transferFrom(FromAddress, ToAddress, TxValue).send();
+    }
+
+    public static boolean executeTransfer(
+            PlayerWalletData commander,
+            ReceiptData rd, CommandSender commandSender) throws Exception {
+        String TokenType = APILibrary.CheckTokenType(rd.type);
+        for (Entry<String, Map<Integer, String>> ERC20Map : Main.ERC20ContractMap.entrySet()) {
+            ERC20ContractData contractData = new ERC20ContractData(Main.ERC20ContractMap.get(ERC20Map.getKey()));
+            if (TokenType.equals(Main.chainlibrary.symbol)) {
+                rd.setGasLimit("21000");
+                if (APILibrary.sendETHTransaction(commandSender, commander, rd, contractData)) return true;
+            } else {
+                if (TokenType.equals(contractData.symbol)) {
+                    rd.setGasLimit(contractData.gaslimit);
+                    if (APILibrary.sendSFTTransaction(commandSender, commander, rd, contractData)) return true;
+                }
+            }
+        }
+        commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("CheckGas"));
+        return false;
+    }
+
+    public static boolean executeTransferFrom(
+            PlayerWalletData commander,
+            ReceiptData rd, CommandSender commandSender) throws Exception {
+        String TokenType = APILibrary.CheckTokenType(rd.type);
+        for (Entry<String, Map<Integer, String>> ERC20Map : Main.ERC20ContractMap.entrySet()) {
+            ERC20ContractData contractData = new ERC20ContractData(Main.ERC20ContractMap.get(ERC20Map.getKey()));
+            if (TokenType.equals(contractData.symbol)) {
+                rd.setGasLimit(contractData.gaslimit);
+                if (APILibrary.sendTransferFromTransaction(commandSender, commander, rd, contractData)) return true;
+            } else {
+                commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("cerror"));
+                return true;
+            }
+        }
+        commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("CheckGas"));
+        return false;
+    }
+
+    public static boolean executeApprove(
+            PlayerWalletData commander,
+            ReceiptData rd, CommandSender commandSender) throws Exception {
+        String TokenType = APILibrary.CheckTokenType(rd.type);
+        for (Entry<String, Map<Integer, String>> ERC20Map : Main.ERC20ContractMap.entrySet()) {
+            ERC20ContractData contractData = new ERC20ContractData(Main.ERC20ContractMap.get(ERC20Map.getKey()));
+            if (TokenType.equals(contractData.symbol)) {
+                rd.setGasLimit(contractData.gaslimit);
+                if (APILibrary.sendApproveTransaction(commandSender, commander, rd, contractData)) return true;
+            }
+        }
+        return false;
     }
 
     public static String CheckTokenType(String Type) {
