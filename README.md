@@ -63,7 +63,13 @@ To use SFTFinance (hereinafter referred to as this software),(author is https://
 - /wallet transfer (name) (address) (amount) - Sends the specified token to the destination address.
 - /wallet transfer (name) (address) (amount) (gasprice) - Sends tokens to target addresses for specified gas prices.
 - /wallet transfer (name) (address) (amount) (gasprice) (gaslimit) - Sends tokens to target addresses specifying gas prices and gas limits.
-
+- /wallet approve (TokenType) (TargetAddress) (amount) - Access target address to approve your ERC20 token, please see info Solidity-Approve method.
+- /wallet approve (TokenType) (TargetAddress) (amount) (gasprice) - Access target address to approve your ERC20 token for specified gas price.
+- /wallet approve (TokenType) (TargetAddress) (amount) (gasprice) (gaslimit) - Access target address to approve your ERC20 token for specified gas price and gas limit.
+- /wallet transferfrom (TokenType) (FromAddress) (TargetAddress) (amount) - Solidity-Transferfrom method.
+- /wallet transferfrom (TokenType) (FromAddress) (TargetAddress) (amount) (gasprice) - Solidity-Transferfrom method.
+- /wallet transferfrom (TokenType) (FromAddress) (TargetAddress) (amount) (gasprice) (gaslimit) - Solidity-Transferfrom method.
+  
 ## Configuration
 
 [View main configuration files and configuration help](/src/main/resources/config.yml)
