@@ -5,6 +5,7 @@ Symbol: BNB #NaiveToken Symbol. 原链代币的标志
 ChainName: "Binance Smart Chain Testnet" #chainname 链名
 ChainID: 97 #blockchain id 链id.
 OnPlayerLoginRegisterWallet: true #whether to create a wallet when the player logs in, true = yes. 是否在玩家登录时创建钱包，true为是
+# playerCanInsertTheyOwnSeed: true #Whether to enable players to enter their own wallets, true = yes. WARNING! This feature will happen in the future, don't enable this!是否允许玩家自行输入钱包. true为是 警告,这个功能暂时还没有实现,请不要开启
 IsMysql: false #whether to use mysql database. 是否使用Mysql数据库.
 MysqlUrl: mysql://localhost:3306/SFTFinance #Mysql Url. Mysql 链接地址.
 MysqlUser: root #Mysql user. Mysql 用户
