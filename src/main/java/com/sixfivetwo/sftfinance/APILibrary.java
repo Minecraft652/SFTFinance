@@ -2,9 +2,9 @@ package com.sixfivetwo.sftfinance;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bitcoinj.crypto.*;
 import org.bitcoinj.wallet.DeterministicSeed;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -12,7 +12,6 @@ import org.web3j.contracts.eip20.generated.ERC20;
 import org.web3j.crypto.*;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameterName;
-import org.web3j.protocol.core.RemoteCall;
 import org.web3j.protocol.core.methods.response.*;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.tx.RawTransactionManager;
@@ -102,7 +101,8 @@ public class APILibrary {
             String PrivateKey = "0x" + keyPair.getPrivateKey().toString(16);
             String PublicKey = keyPair.getPublicKey().toString(16);
             insertData(UUID, PlayerID, MasterPrivateKey, Address, PrivateKey, PublicKey);
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
         return true;
     }
 
@@ -164,12 +164,13 @@ public class APILibrary {
         }
     }
 
-    public static void playerSendInteractiveMessage(CommandSender commandSender, List<TextComponent> messageList) {
-        for (TextComponent message : messageList) {
-            commandSender.spigot().sendMessage(message);
+    /*
+        public static void playerSendInteractiveMessage(CommandSender commandSender, List<TextComponent> messageList) {
+            for (TextComponent message : messageList) {
+                commandSender.spigot().sendMessage(message);
+            }
         }
-    }
-
+    */
     public static boolean sendSFTTransaction(@NotNull CommandSender commandSender, PlayerWalletData commander, ReceiptData rd, ERC20ContractData contractData) throws Exception {
         if (APILibrary.CheckLegal(contractData, commander, commander.fromaddress, rd.toAddress, rd.gasLimit, rd.gasPrice, rd.value, false)) {
             commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("dispose"));
@@ -212,12 +213,12 @@ public class APILibrary {
     public static String getVersion() {
         try {
             if (Objects.requireNonNull(Main.fileconfig.getString("Language")).contains("zh")) {
-                return Main.SFTInfo + "§a Release1.4, 作者保留所有权利";
+                return Main.SFTInfo + "§a Release1.5, 作者保留所有权利";
             } else {
-                return Main.SFTInfo + "Release1.4, Author all rights reserved";
+                return Main.SFTInfo + "Release1.5, Author all rights reserved";
             }
         } catch (Exception ex) {
-            return Main.SFTInfo + "Release1.4, Author all rights reserved";
+            return Main.SFTInfo + "Release1.5, Author all rights reserved";
         }
     }
 
@@ -376,7 +377,7 @@ public class APILibrary {
                 return TokenSymbol;
             }
         }
-        return null;
+        return "null";
     }
 
     public static String CheckDealType(String Type) {
@@ -385,7 +386,86 @@ public class APILibrary {
                 return DealMap.getKey();
             }
         }
-        return null;
+        return "null";
+    }
+
+    public static boolean systemETHExchange(PlayerWalletData commander, ExchangeData exchangeData, CommandSender commandSender, String ToAddress, String value, String executecommand, String gasLimit, String gasPrice) {
+        commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("dispose"));
+        String TransactionHash = null;
+        try {
+            TransactionHash = TransferETH(commander, ToAddress, gasLimit, gasPrice, value);
+        } catch (IOException e) {
+            commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("TransferFail"));
+            return false;
+        }
+        return executeCommand(exchangeData, commandSender, executecommand, TransactionHash);
+    }
+
+    public static boolean executeCommand(ExchangeData exchangeData, CommandSender commandSender, String executecommand, String transactionHash) {
+        commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("TransferSuccess") + "\n\u00a7a" + Main.prop.getProperty("ExplorerUrl") + transactionHash);
+        Bukkit.getScheduler().runTask(Main.getPlugin(Main.class), () -> {
+            Player commandSenderPlayer = (Player) commandSender;
+            boolean isOp = commandSenderPlayer.isOp();
+            if (APILibrary.executeCommand(commandSenderPlayer, executecommand, isOp)) {
+                commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("ExchangeSuccess") + " \u00a7a" + exchangeData.price + " \u00a7c" + exchangeData.tokentype);
+            }
+        });
+        return true;
+    }
+
+    public static boolean systemSFTExchange(PlayerWalletData commander, ExchangeData exchangeData, ERC20ContractData contractData, CommandSender commandSender, String ToAddress, String value, String executecommand, String gasLimit, String gasPrice) {
+        commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("dispose"));
+        String TransactionHash = null;
+        try {
+            TransactionHash = APILibrary.TransferSFT(contractData, commander, ToAddress, gasLimit, gasPrice, value).getTransactionHash();
+        } catch (Exception e) {
+            commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("TransferFail"));
+            return false;
+        }
+        return executeCommand(exchangeData, commandSender, executecommand, TransactionHash);
+    }
+
+    public static String checkLegalExchange(String Type, PlayerWalletData commander, CommandSender commandSender) throws IOException {
+        String DealType = CheckDealType(Type);
+        for (Entry<String, Map<Integer, String>> DealMap : Main.ExchangeMap.entrySet()) {
+            if (DealType.equals(DealMap.getKey())) {
+                ExchangeData exchangeData = new ExchangeData(Main.ExchangeMap.get(DealMap.getKey()));
+                String TokenType = CheckTokenType(exchangeData.tokentype);
+                if (!TokenType.equals(exchangeData.tokentype)) {
+                    return "errortokentype";
+                }
+                String ToAddress = Main.ConsoleWallet.fromaddress;
+                String value = exchangeData.price;
+                String executecommand = exchangeData.executecommand.replace("{player}", commander.playerid);
+                for (Entry<String, Map<Integer, String>> ERC20Map : Main.ERC20ContractMap.entrySet()) {
+                    ERC20ContractData contractData = new ERC20ContractData(Main.ERC20ContractMap.get(ERC20Map.getKey()));
+                    if (TokenType.equals(Main.chainlibrary.symbol)) {
+                        String gasLimit = "21000";
+                        String gasPrice = String.valueOf(Main.chainlibrary.web3j.ethGasPrice().send().getGasPrice().divide(new BigInteger("1000000000")));
+                        if (!CheckLegal(contractData, commander, commander.fromaddress, ToAddress, gasLimit, gasPrice, value, true)) {
+                            return "unlegalparameters";
+                        }
+                        if (systemETHExchange(commander, exchangeData, commandSender, ToAddress, value, executecommand, gasLimit, gasPrice)) {
+                            return "success";
+                        }
+                        return "CheckGas";
+                    } else {
+                        String gasLimit = contractData.gaslimit;
+                        String gasPrice = String.valueOf(Main.chainlibrary.web3j.ethGasPrice().send().getGasPrice().divide(new BigInteger("1000000000")));
+                        if (TokenType.equals(contractData.symbol)) {
+                            if (!CheckLegal(contractData, commander, commander.fromaddress, ToAddress, gasLimit, gasPrice, value, false)) {
+                                return "unlegalparameters";
+                            }
+                            if (systemSFTExchange(commander, exchangeData, contractData, commandSender, ToAddress, value, executecommand, gasLimit, gasPrice)) {
+                                return "success";
+                            }
+                            return "unknowerror";
+                        }
+                    }
+                }
+            }
+        }
+        return "errordeal";
     }
 
     public static boolean CheckLegal(

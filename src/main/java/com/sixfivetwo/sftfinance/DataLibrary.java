@@ -96,6 +96,38 @@ class ExchangeData {
     }
 }
 
+/*
+class SystemExchangeData {
+    public PlayerWalletData commander;
+    public ExchangeData exchangeData;
+    public ERC20ContractData contractData;
+    public CommandSender commandSender;
+    public String ToAddress;
+    public String value;
+    public String executecommand;
+    public String gasLimit;
+    public String gasPrice;
+    public String type;
+    public String errorMessage;
+
+    SystemExchangeData(PlayerWalletData commander, ExchangeData exchangeData, ERC20ContractData contractData, CommandSender commandSender, String ToAddress, String value, String executecommand, String gasLimit, String gasPrice, String type) {
+        this.commander = commander;
+        this.exchangeData = exchangeData;
+        this.contractData = contractData;
+        this.commandSender = commandSender;
+        this.ToAddress = ToAddress;
+        this.value = value;
+        this.executecommand = executecommand;
+        this.gasLimit = gasLimit;
+        this.gasPrice = gasPrice;
+        this.type = type;
+    }
+
+    public void setErrorMessage(String message) {
+        this.errorMessage = message;
+    }
+}
+*/
 class ReceiptData {
     public String type;
     public String fromAddress;

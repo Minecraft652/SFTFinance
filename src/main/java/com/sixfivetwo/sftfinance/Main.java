@@ -8,7 +8,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.io.File;
 import java.io.InputStream;
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -148,7 +147,9 @@ public class Main extends JavaPlugin {
                     conn = APILibrary.getConnection("sqlite", url, "null", "null");
                     APILibrary.createWallet("00000000-0000-0000-0000-000000000000", "CONSOLE");
                 }
-            } catch (Exception ignored) {}
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
 
             chainlibrary = new BlockchainData(fileconfig.getString("ChainName"), fileconfig.getString("HttpUrl"), fileconfig.getLong("ChainID"), fileconfig.getString("Symbol"));
             ConsoleWallet = new PlayerWalletData("CONSOLE");
@@ -166,6 +167,37 @@ public class Main extends JavaPlugin {
             }
 
             System.out.println(APILibrary.getVersion());
+
+            if ("".equals(fileconfig.getString("Version")) ||
+                    "".equals(fileconfig.getString("Language")) ||
+                    "".equals(fileconfig.getString("HttpUrl")) ||
+                    "".equals(fileconfig.getString("Symbol")) ||
+                    "".equals(fileconfig.getString("ChainName")) ||
+                    "".equals(fileconfig.getString("ChainID")) ||
+                    "".equals(fileconfig.getString("OnPlayerLoginRegisterWallet")) ||
+                    //"".equals(fileconfig.getString("playerCanInsertTheyOwnSeed")) ||
+                    "".equals(fileconfig.getString("IsMysql")) ||
+                    "".equals(fileconfig.getString("MysqlUrl")) ||
+                    "".equals(fileconfig.getString("MysqlUser")) ||
+                    "".equals(fileconfig.getString("MysqlPassword")) ||
+                    null == fileconfig.getString("Version") ||
+                    null == fileconfig.getString("Language") ||
+                    null == fileconfig.getString("HttpUrl") ||
+                    null == fileconfig.getString("Symbol") ||
+                    null == fileconfig.getString("ChainName") ||
+                    null == fileconfig.getString("ChainID") ||
+                    null == fileconfig.getString("OnPlayerLoginRegisterWallet") ||
+                    //null == fileconfig.getString("playerCanInsertTheyOwnSeed") ||
+                    null == fileconfig.getString("IsMysql") ||
+                    null == fileconfig.getString("MysqlUrl") ||
+                    null == fileconfig.getString("MysqlUser") ||
+                    null == fileconfig.getString("MysqlPassword")) {
+                System.out.println(Main.prop.getProperty("updateconfig"));
+                System.out.println(Main.prop.getProperty("updateconfig"));
+                System.out.println(Main.prop.getProperty("updateconfig"));
+                System.out.println(Main.prop.getProperty("updateconfig"));
+                System.out.println(Main.prop.getProperty("updateconfig"));
+            }
 
         } catch (Exception ex) {
             ex.printStackTrace();
