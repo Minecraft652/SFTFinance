@@ -1,5 +1,6 @@
 package com.sixfivetwo.sftfinance;
 
+import com.sixfivetwo.sftfinance.datalibrary.*;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import org.bitcoinj.crypto.*;
@@ -99,7 +100,7 @@ public class APILibrary {
             String Address = "0x" + address;
             String MasterPrivateKey = Joiner.on(",").join(str);
             String PrivateKey = "0x" + keyPair.getPrivateKey().toString(16);
-            String PublicKey = keyPair.getPublicKey().toString(16);
+            String PublicKey = "0";
             insertData(UUID, PlayerID, MasterPrivateKey, Address, PrivateKey, PublicKey);
         } catch (Exception ignored) {
         }
@@ -164,13 +165,6 @@ public class APILibrary {
         }
     }
 
-    /*
-        public static void playerSendInteractiveMessage(CommandSender commandSender, List<TextComponent> messageList) {
-            for (TextComponent message : messageList) {
-                commandSender.spigot().sendMessage(message);
-            }
-        }
-    */
     public static boolean sendSFTTransaction(@NotNull CommandSender commandSender, PlayerWalletData commander, ReceiptData rd, ERC20ContractData contractData) throws Exception {
         if (APILibrary.CheckLegal(contractData, commander, commander.fromaddress, rd.toAddress, rd.gasLimit, rd.gasPrice, rd.value, false)) {
             commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("dispose"));
@@ -206,19 +200,19 @@ public class APILibrary {
             commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("donterror"));
             return true;
         }
-        commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("TransferSuccess") + "\n\u00a7a" + Main.prop.getProperty("ExplorerUrl") + transactionHash);
+        commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("TransferSuccess") + "\n\u00a7a" + Main.fileconfig.getString("ExplorerUrl") + transactionHash);
         return true;
     }
 
     public static String getVersion() {
         try {
             if (Objects.requireNonNull(Main.fileconfig.getString("Language")).contains("zh")) {
-                return Main.SFTInfo + "§a Release1.5, 作者保留所有权利";
+                return Main.SFTInfo + "§a Release1.5.1, 作者保留所有权利";
             } else {
-                return Main.SFTInfo + "Release1.5, Author all rights reserved";
+                return Main.SFTInfo + "Release1.5.1, Author all rights reserved";
             }
         } catch (Exception ex) {
-            return Main.SFTInfo + "Release1.5, Author all rights reserved";
+            return Main.SFTInfo + "Release1.5.1, Author all rights reserved";
         }
     }
 
@@ -238,8 +232,8 @@ public class APILibrary {
         return null;
     }
 
-    public static Credentials getCredential(String PrivateKey, String PublicKey) {
-        return Credentials.create(PrivateKey, PublicKey);
+    public static Credentials getCredential(String PrivateKey) {
+        return Credentials.create(PrivateKey);
     }
 
     public static ERC20 getDefaultGasERC20(ERC20ContractData erc20ContractData, PlayerWalletData playerWalletData) {
@@ -321,7 +315,7 @@ public class APILibrary {
             ReceiptData rd, CommandSender commandSender) throws Exception {
         String TokenType = APILibrary.CheckTokenType(rd.type);
         for (Entry<String, Map<Integer, String>> ERC20Map : Main.ERC20ContractMap.entrySet()) {
-            ERC20ContractData contractData = new ERC20ContractData(Main.ERC20ContractMap.get(ERC20Map.getKey()));
+            ERC20ContractData contractData = new ERC20ContractData(Main.ERC20ContractMap.get(ERC20Map.getKey()), Main.chainlibrary);
             if (TokenType.equals(Main.chainlibrary.symbol)) {
                 rd.setGasLimit("21000");
                 if (APILibrary.sendETHTransaction(commandSender, commander, rd, contractData)) return true;
@@ -341,7 +335,7 @@ public class APILibrary {
             ReceiptData rd, CommandSender commandSender) throws Exception {
         String TokenType = APILibrary.CheckTokenType(rd.type);
         for (Entry<String, Map<Integer, String>> ERC20Map : Main.ERC20ContractMap.entrySet()) {
-            ERC20ContractData contractData = new ERC20ContractData(Main.ERC20ContractMap.get(ERC20Map.getKey()));
+            ERC20ContractData contractData = new ERC20ContractData(Main.ERC20ContractMap.get(ERC20Map.getKey()), Main.chainlibrary);
             if (TokenType.equals(contractData.symbol)) {
                 rd.setGasLimit(contractData.gaslimit);
                 if (APILibrary.sendTransferFromTransaction(commandSender, commander, rd, contractData)) return true;
@@ -359,7 +353,7 @@ public class APILibrary {
             ReceiptData rd, CommandSender commandSender) throws Exception {
         String TokenType = APILibrary.CheckTokenType(rd.type);
         for (Entry<String, Map<Integer, String>> ERC20Map : Main.ERC20ContractMap.entrySet()) {
-            ERC20ContractData contractData = new ERC20ContractData(Main.ERC20ContractMap.get(ERC20Map.getKey()));
+            ERC20ContractData contractData = new ERC20ContractData(Main.ERC20ContractMap.get(ERC20Map.getKey()), Main.chainlibrary);
             if (TokenType.equals(contractData.symbol)) {
                 rd.setGasLimit(contractData.gaslimit);
                 if (APILibrary.sendApproveTransaction(commandSender, commander, rd, contractData)) return true;
@@ -402,7 +396,7 @@ public class APILibrary {
     }
 
     public static boolean executeCommand(ExchangeData exchangeData, CommandSender commandSender, String executecommand, String transactionHash) {
-        commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("TransferSuccess") + "\n\u00a7a" + Main.prop.getProperty("ExplorerUrl") + transactionHash);
+        commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("TransferSuccess") + "\n\u00a7a" + Main.fileconfig.getString("ExplorerUrl") + transactionHash);
         Bukkit.getScheduler().runTask(Main.getPlugin(Main.class), () -> {
             Player commandSenderPlayer = (Player) commandSender;
             boolean isOp = commandSenderPlayer.isOp();
@@ -438,7 +432,7 @@ public class APILibrary {
                 String value = exchangeData.price;
                 String executecommand = exchangeData.executecommand.replace("{player}", commander.playerid);
                 for (Entry<String, Map<Integer, String>> ERC20Map : Main.ERC20ContractMap.entrySet()) {
-                    ERC20ContractData contractData = new ERC20ContractData(Main.ERC20ContractMap.get(ERC20Map.getKey()));
+                    ERC20ContractData contractData = new ERC20ContractData(Main.ERC20ContractMap.get(ERC20Map.getKey()), Main.chainlibrary);
                     if (TokenType.equals(Main.chainlibrary.symbol)) {
                         String gasLimit = "21000";
                         String gasPrice = String.valueOf(Main.chainlibrary.web3j.ethGasPrice().send().getGasPrice().divide(new BigInteger("1000000000")));

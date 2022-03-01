@@ -1,5 +1,6 @@
 package com.sixfivetwo.sftfinance;
 
+import com.sixfivetwo.sftfinance.datalibrary.*;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -12,7 +13,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
-
 
 public class Main extends JavaPlugin {
     final static String SFTInfo = "§a[§6SFT§cFinance§a] §r";
@@ -44,24 +44,30 @@ public class Main extends JavaPlugin {
             File walletfile = new File(getDataFolder(), "wallets.db");
             File zhhelpfile = new File(getDataFolder(), "help_zh_CN.yml");
             File enhelpfile = new File(getDataFolder(), "help_en_US.yml");
+            File ruhelpfile = new File(getDataFolder(), "help_ru_RU.yml");
             File zhlanfile = new File(getDataFolder(), "zh_CN.properties");
             File enlanfile = new File(getDataFolder(), "en_US.properties");
+            File rulanfile = new File(getDataFolder(), "ru_RU.properties");
             FileMaps.put("config.yml", configfile);
             FileMaps.put("exchange.yml", exchangefile);
             FileMaps.put("contract.yml", contractfile);
             FileMaps.put("wallets.db", walletfile);
             FileMaps.put("help_zh_CN.yml", zhhelpfile);
             FileMaps.put("help_en_US.yml", enhelpfile);
+            FileMaps.put("help_ru_RU.yml", ruhelpfile);
             FileMaps.put("zh_CN.properties", zhlanfile);
             FileMaps.put("en_US.properties", enlanfile);
+            FileMaps.put("ru_RU.properties", enlanfile);
             InternalFileMaps.put("config.yml", getResource("config.yml"));
             InternalFileMaps.put("exchange.yml", getResource("exchange.yml"));
             InternalFileMaps.put("contract.yml", getResource("contract.yml"));
             InternalFileMaps.put("wallets.db", getResource("wallets.db"));
             InternalFileMaps.put("help_zh_CN.yml", getResource("help_zh_CN.yml"));
             InternalFileMaps.put("help_en_US.yml", getResource("help_en_US.yml"));
+            InternalFileMaps.put("help_ru_RU.yml", getResource("help_ru_RU.yml"));
             InternalFileMaps.put("zh_CN.properties", getResource("zh_CN.properties"));
             InternalFileMaps.put("en_US.properties", getResource("en_US.properties"));
+            InternalFileMaps.put("ru_RU.properties", getResource("ru_RU.properties"));
 
             if (!getDataFolder().exists()) {
                 getDataFolder().mkdir();
@@ -98,6 +104,23 @@ public class Main extends JavaPlugin {
 
             if (Objects.requireNonNull(fileconfig.getString("Language")).contains("zh")) {
                 filehelp = YamlConfiguration.loadConfiguration(zhhelpfile);
+                for (String helproot : filehelp.getKeys(false)) {
+                    Map<Integer, String> FileMapHelp = new HashMap<>();
+                    FileMapHelp.put(1, filehelp.getString(helproot + ".front"));
+                    FileMapHelp.put(2, filehelp.getString(helproot + ".comment1"));
+                    FileMapHelp.put(3, filehelp.getString(helproot + ".comment2"));
+                    FileMapHelp.put(4, filehelp.getString(helproot + ".comment3"));
+                    FileMapHelp.put(5, filehelp.getString(helproot + ".comment4"));
+                    FileMapHelp.put(6, filehelp.getString(helproot + ".comment5"));
+                    FileMapHelp.put(7, filehelp.getString(helproot + ".comment6"));
+                    FileMapHelp.put(8, filehelp.getString(helproot + ".comment7"));
+                    FileMapHelp.put(9, filehelp.getString(helproot + ".comment8"));
+                    FileMapHelp.put(10, filehelp.getString(helproot + ".comment9"));
+                    FileMapHelp.put(11, filehelp.getString(helproot + ".comment10"));
+                    HelpPageMap.put(helproot, FileMapHelp);
+                }
+            } else if (Objects.requireNonNull(fileconfig.getString("Language")).contains("ru")) {
+                filehelp = YamlConfiguration.loadConfiguration(ruhelpfile);
                 for (String helproot : filehelp.getKeys(false)) {
                     Map<Integer, String> FileMapHelp = new HashMap<>();
                     FileMapHelp.put(1, filehelp.getString(helproot + ".front"));
@@ -171,11 +194,12 @@ public class Main extends JavaPlugin {
             if ("".equals(fileconfig.getString("Version")) ||
                     "".equals(fileconfig.getString("Language")) ||
                     "".equals(fileconfig.getString("HttpUrl")) ||
+                    "".equals(fileconfig.getString("ExplorerUrl")) ||
                     "".equals(fileconfig.getString("Symbol")) ||
                     "".equals(fileconfig.getString("ChainName")) ||
                     "".equals(fileconfig.getString("ChainID")) ||
                     "".equals(fileconfig.getString("OnPlayerLoginRegisterWallet")) ||
-                    //"".equals(fileconfig.getString("playerCanInsertTheyOwnSeed")) ||
+                    "".equals(fileconfig.getString("playerCanImportTheyOwnWallet")) ||
                     "".equals(fileconfig.getString("IsMysql")) ||
                     "".equals(fileconfig.getString("MysqlUrl")) ||
                     "".equals(fileconfig.getString("MysqlUser")) ||
@@ -183,11 +207,12 @@ public class Main extends JavaPlugin {
                     null == fileconfig.getString("Version") ||
                     null == fileconfig.getString("Language") ||
                     null == fileconfig.getString("HttpUrl") ||
+                    null == fileconfig.getString("ExplorerUrl") ||
                     null == fileconfig.getString("Symbol") ||
                     null == fileconfig.getString("ChainName") ||
                     null == fileconfig.getString("ChainID") ||
                     null == fileconfig.getString("OnPlayerLoginRegisterWallet") ||
-                    //null == fileconfig.getString("playerCanInsertTheyOwnSeed") ||
+                    null == fileconfig.getString("playerCanImportTheyOwnWallet") ||
                     null == fileconfig.getString("IsMysql") ||
                     null == fileconfig.getString("MysqlUrl") ||
                     null == fileconfig.getString("MysqlUser") ||

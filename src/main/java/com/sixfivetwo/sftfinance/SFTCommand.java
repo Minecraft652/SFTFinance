@@ -1,11 +1,13 @@
 package com.sixfivetwo.sftfinance;
 
+import com.sixfivetwo.sftfinance.datalibrary.*;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.web3j.crypto.Credentials;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.math.BigDecimal;
@@ -35,7 +37,7 @@ public class SFTCommand implements CommandExecutor {
                             message.add(Main.SFTInfo + Main.prop.getProperty("YourAddress") + commander.fromaddress);
                             message.add(Main.SFTInfo + Main.prop.getProperty("YourBalance") + balance + " " + Main.chainlibrary.symbol);
                             for (Entry<String, Map<Integer, String>> ERC20Map : Main.ERC20ContractMap.entrySet()) {
-                                ERC20ContractData ERC20Data = new ERC20ContractData(Main.ERC20ContractMap.get(ERC20Map.getKey()));
+                                ERC20ContractData ERC20Data = new ERC20ContractData(Main.ERC20ContractMap.get(ERC20Map.getKey()), Main.chainlibrary);
                                 BigDecimal sftbalance = new BigDecimal(APILibrary.getERC20Balance(ERC20Data, commander, commander.fromaddress)).divide(new BigDecimal(ERC20Data.decimal));
                                 message.add(Main.SFTInfo + Main.prop.getProperty("YourBalance") + sftbalance + " " + ERC20Data.symbol);
                             }
@@ -57,7 +59,7 @@ public class SFTCommand implements CommandExecutor {
                                 message.add(Main.SFTInfo + Main.prop.getProperty("CurrentBlock") + Main.chainlibrary.web3j.ethBlockNumber().send().getBlockNumber());
                                 message.add(Main.SFTInfo + Main.prop.getProperty("DefaultGasPrice") + Main.chainlibrary.web3j.ethGasPrice().send().getGasPrice());
                                 for (Entry<String, Map<Integer, String>> ERC20Map : Main.ERC20ContractMap.entrySet()) {
-                                    ERC20ContractData ERC20Data = new ERC20ContractData(Main.ERC20ContractMap.get(ERC20Map.getKey()));
+                                    ERC20ContractData ERC20Data = new ERC20ContractData(Main.ERC20ContractMap.get(ERC20Map.getKey()), Main.chainlibrary);
                                     message.add(Main.SFTInfo + Main.prop.getProperty("TokenSymbol") + ERC20Data.symbol);
                                     message.add(Main.SFTInfo + ERC20Data.symbol + " " + Main.prop.getProperty("ExchangeGasLimit") + ERC20Data.gaslimit);
                                 }
@@ -100,7 +102,7 @@ public class SFTCommand implements CommandExecutor {
                             if (args[0].equals("gas")) {
                                 List<String> gasRequire = new ArrayList<>();
                                 for (Entry<String, Map<Integer, String>> ERC20Map : Main.ERC20ContractMap.entrySet()) {
-                                    ERC20ContractData ERC20Data = new ERC20ContractData(Main.ERC20ContractMap.get(ERC20Map.getKey()));
+                                    ERC20ContractData ERC20Data = new ERC20ContractData(Main.ERC20ContractMap.get(ERC20Map.getKey()), Main.chainlibrary);
                                     if (new BigDecimal(ERC20Data.gasrequire).compareTo(new BigDecimal(String.valueOf(APILibrary.getEthBalance(commander.fromaddress, true)))) > 0) {
                                         gasRequire.add(Main.SFTInfo + ERC20Data.symbol + " " + Main.prop.getProperty("GasRequire") + ERC20Data.gasrequire);
                                         message.add(Main.SFTInfo + Main.prop.getProperty("Ycantsend") + ERC20Data.symbol);
@@ -152,7 +154,7 @@ public class SFTCommand implements CommandExecutor {
                                 message.add(Main.SFTInfo + Main.prop.getProperty("TargetAddress") + playerwallet.fromaddress);
                                 message.add(Main.SFTInfo + Main.prop.getProperty("TargetBalance") + ethbalance + " " + Main.chainlibrary.symbol);
                                 for (Entry<String, Map<Integer, String>> ERC20Map : Main.ERC20ContractMap.entrySet()) {
-                                    ERC20ContractData ERC20Data = new ERC20ContractData(Main.ERC20ContractMap.get(ERC20Map.getKey()));
+                                    ERC20ContractData ERC20Data = new ERC20ContractData(Main.ERC20ContractMap.get(ERC20Map.getKey()), Main.chainlibrary);
                                     BigDecimal balances = new BigDecimal(APILibrary.getERC20Balance(ERC20Data, commander, commander.fromaddress)).divide(new BigDecimal(ERC20Data.decimal));
                                     message.add(Main.SFTInfo + Main.prop.getProperty("TargetBalance") + balances + " " + ERC20Data.symbol);
                                 }
@@ -169,6 +171,34 @@ public class SFTCommand implements CommandExecutor {
                                 message.add(Main.SFTInfo + Main.prop.getProperty(Message));
                                 APILibrary.playerSendMessage(commandSender, message);
                                 return;
+                            }
+                            if (args[0].equals("import")) {
+                                if (!Main.fileconfig.getBoolean("playerCanImportTheyOwnWallet")) {
+                                    commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("featureunable"));
+                                    return;
+                                }
+                                if (commander.has) {
+                                    commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("AlreadyReg"));
+                                    return;
+                                }
+                                String PrivateKey = args[1];
+                                try {
+                                    Credentials creds = APILibrary.getCredential(PrivateKey);
+                                    if (commandSender.getName().equals("CONSOLE")) {
+                                        if (commander.playerid.equals("CONSOLE")) {
+                                            APILibrary.insertData("00000000-0000-0000-0000-000000000000", "CONSOLE", "0", creds.getAddress(), PrivateKey, "0");
+                                            commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("importsuccess"));
+                                            return;
+                                        }
+                                    }
+                                    Player player = Bukkit.getPlayer(commandSender.getName());
+                                    APILibrary.insertData(String.valueOf(player.getUniqueId()), player.getName(), "0", creds.getAddress(), PrivateKey, "0");
+                                    commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("importsuccess"));
+                                    return;
+                                } catch (Exception ex) {
+                                    commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("errorprivatekey"));
+                                    return;
+                                }
                             }
                         case 3:
                             if (args[0].equals("exchange")) {
