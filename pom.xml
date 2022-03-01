@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.sixfivetwo.sftfinance</groupId>
   <artifactId>SFTFinance</artifactId>
-  <version>Release1.4</version>
+  <version>Release1.5.1</version>
   <properties>
   	<maven.compiler.target>1.8</maven.compiler.target>
   	<maven.compiler.source>1.8</maven.compiler.source>
@@ -58,13 +58,13 @@
   	<dependency>
   		<groupId>org.spigotmc</groupId>
   		<artifactId>spigot-api</artifactId>
-  		<version>1.17.1-R0.1-SNAPSHOT</version>
+  		<version>1.8.8-R0.1-SNAPSHOT</version>
   		<scope>compile</scope>
   	</dependency>
   	<dependency>
   		<groupId>org.bitcoinj</groupId>
   		<artifactId>bitcoinj-core</artifactId>
-  		<version>0.15.10</version>
+  		<version>0.16.1</version>
   	</dependency>
   	<dependency>
   		<groupId>com.google.guava</groupId>

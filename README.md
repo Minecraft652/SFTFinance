@@ -12,14 +12,25 @@ Its features provide players and administrators with operations on the Ethereum 
 
 Tokens that allow interaction between original tokens and ERC20 standard tokens smart contracts.(Like Ether,USDT)
 
-## End User License Agreement
+## SFTFinance End User License Agreement
 
-To use SFTFinance (hereinafter referred to as this software),(author is https://github.com/Minecraft652) you need to agree to the following agreements:
+Copyright (c) Github:Minecraft652. All rights reserved.
+https://github.com/Minecraft652
+
+Permission is hereby granted, Only free to provide the right to use and copy the software and relevant documents to anyone.
+It does not include any rights to modify, merge, distribute, sublicense and/or sell copies of the Software or other special rights.
+If you require additional rights, please contact the author for permission.
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+## To use SFTFinance you should know.
 
 - The player wallet data of this software is the user's personal privacy data.
 - Using this software, all operations are caused by personal, such as asset loss the author does not assume any responsibility.
 - Investment is risky and operation should be cautious. Please comply with local laws and regulations when using this software.
-- The author reserves all rights of this software, users and administrators can use this software for free.
+- The author reserves all rights of this software. Please read the license agreement. If you continue to use the software, it will be assumed that you have agreed.
 
 ## Features
 
@@ -57,6 +68,7 @@ To use SFTFinance (hereinafter referred to as this software),(author is https://
 - /wallet gas - View default Gas limits, prices, etc.
 - /wallet delete - Delete the current wallet.
 - /wallet player (name) - View the specified player's wallet address, balance.
+- /wallet import (privatekey) - import your private key into SFTFinance.
 - /wallet exchange - View the currently active deals.
 - /wallet exchange (transaction pair) - Transactions with the server. (The administrator needs to configure the transaction pair.)
 - /wallet exchange (transaction pair) info - View this deal details.
