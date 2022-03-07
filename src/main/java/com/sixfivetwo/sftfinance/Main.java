@@ -57,7 +57,7 @@ public class Main extends JavaPlugin {
             FileMaps.put("help_ru_RU.yml", ruhelpfile);
             FileMaps.put("zh_CN.properties", zhlanfile);
             FileMaps.put("en_US.properties", enlanfile);
-            FileMaps.put("ru_RU.properties", enlanfile);
+            FileMaps.put("ru_RU.properties", rulanfile);
             InternalFileMaps.put("config.yml", getResource("config.yml"));
             InternalFileMaps.put("exchange.yml", getResource("exchange.yml"));
             InternalFileMaps.put("contract.yml", getResource("contract.yml"));
