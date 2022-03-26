@@ -43,10 +43,12 @@ https://github.com/Minecraft652
 - 支持 MySQL , SQLite 数据库。
 - 支持自定义 ERC20 代币合约。
 - 支持兼容 EVM 的区块链及自定义区块链 HTTP 地址。
+- 支持所有基于以太坊网络的区块链钱包, 以及玩家可以自行导入。
 - 支持管理员自定义交易对。
+- 支持玩家使用游戏物品数字货币定价进行交易。
 - 支持生成数字钱包导出到其他钱包。
 - 支持多个代币合约和交易对。
-- 暂不支持 RPC 连接区块链。
+- 支持老版本 Minecraft 至 1.8。
 
 ## 安装
 
@@ -71,6 +73,12 @@ https://github.com/Minecraft652
 - /wallet exchange - 查看当前活跃的交易对.
 - /wallet exchange <交易对> - 与管理员预设的交易对向服务器发起交易.
 - /wallet exchange <交易对> info - 查看该交易对详细信息.
+- /wallet trade <玩家ID> <代币名称> <金额> - 向目标玩家发送一笔物品交易. 需要打开 playerCanTradeEachOther 功能在 config.yml 文件里.
+- /wallet trade list - 查看你的所有交易.
+- /wallet trade edit <交易ID> - 编辑这个交易, 只允许发送方或已经被接受过的接收方, 拿走全部物品将自动删除交易或者修改等操作.
+- /wallet trade accept <交易ID> - 接受这个交易, 只允许接收方, 又接收方出钱 (币)
+- /wallet trade deny <交易ID> - 拒绝这个交易, 只允许接收方, 拒绝后发送方可使用 /wallet trade edit <交易ID> 取回物品
+- /wallet trade info <交易ID> - 查看这个交易的详细信息.
 - /wallet transfer <代币名称> <目标地址> <金额> - 向目标地址发送指定代币.
 - /wallet transfer <代币名称> <目标地址> <金额> <燃油价格> - 指定燃料价格向目标地址发送代币.
 - /wallet transfer <代币名称> <目标地址> <金额> <燃油价格> <燃油限制> - 指定燃料价格和燃油限制向目标地址发送代币.
@@ -107,6 +115,7 @@ Java 版本 :
 Spigot 版本 : 
 
 - CraftBukkit version 3096-Spigot-9fb885e-296df56 (MC: 1.16.5) (Implementing API version 1.16.5-R0.1-SNAPSHOT)
+- CraftBukkit version git-Spigot-21fe707-741a1bd (MC: 1.8.8) (Implementing API version 1.8.8-R0.1-SNAPSHOT)
 
 操作系统 : 
 

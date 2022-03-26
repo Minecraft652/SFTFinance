@@ -44,13 +44,16 @@ THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR I
 - Support MySQL Database , SQLite.
 - Support custom ERC20 token contracts.
 - Support EVM compatible blockchain and custom BLOCKCHAIN HTTP address.
+- Support All Ethereum-based wallet. and player can import their own wallet.
 - Supports administrators to customize transaction pairs.
+- Supports player can using game items trade tokens each other.
 - Supports generating digital wallets and exporting them to other wallets.
 - Supports multiple token contracts and trading pairs.
-- RPC connection blockchain is not currently supported.
+- Supports legacy minecraft version like 1.8.
 
 ## Installation
 
+- Delete your old SFTFinance plugin configs and language file. help file...
 - Put the plugin into the server side's plugins folder
 - If the server is started, files such as config.yml are automatically generated
 - Plugin can only be configured when the server is disabled
@@ -71,6 +74,12 @@ THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR I
 - /wallet import (privatekey) - import your private key into SFTFinance.
 - /wallet exchange - View the currently active deals.
 - /wallet exchange (transaction pair) - Transactions with the server. (The administrator needs to configure the transaction pair.)
+- /wallet trade (PlayerID) (TokenType) (amount) - Send transaction to target player. Need enable playerCanTradeEachOther in config.yml.
+- /wallet trade list - List your all transactions.
+- /wallet trade edit (trade id) - Edit this transaction. only the sender or already accepted transactions, take it all will delete this transaction or modify.
+- /wallet trade accept (trade id) - Accept this transaction. only the receiver. and receiver will pay for this.
+- /wallet trade deny (trade id) - Deny this transaction. next need sender to use /wallet trade edit (TradeID) take their items.
+- /wallet trade info (trade id) - View the transaction info.
 - /wallet exchange (transaction pair) info - View this deal details.
 - /wallet transfer (name) (address) (amount) - Sends the specified token to the destination address.
 - /wallet transfer (name) (address) (amount) (gasprice) - Sends tokens to target addresses for specified gas prices.
@@ -108,6 +117,7 @@ Java version :
 Server version : 
 
 - CraftBukkit version 3096-Spigot-9fb885e-296df56 (MC: 1.16.5) (Implementing API version 1.16.5-R0.1-SNAPSHOT)
+- CraftBukkit version git-Spigot-21fe707-741a1bd (MC: 1.8.8) (Implementing API version 1.8.8-R0.1-SNAPSHOT)
 
 Operating system : 
 
@@ -119,5 +129,5 @@ Operating system :
 - this is my ethereum address: 0x5b615f1a1989ee2636bfbfe471b1f66bca16f926
 - I am Minecraft_652, a programmer who loves learning and is committed to network decentralization.
 - Thank you very much for your support! My contact information is as follows:
-- QQ : 919899140 , Telegram : https://t.me/SIXFIVETWO
+- QQ : 919899140 , Telegram : https://t.me/SIXFIVETWO, Twitter : @Minecraft652
 - ENJOY TO USE! :Smile

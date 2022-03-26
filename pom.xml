@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.sixfivetwo.sftfinance</groupId>
   <artifactId>SFTFinance</artifactId>
-  <version>Release1.5.1</version>
+  <version>Release1.6</version>
   <properties>
   	<maven.compiler.target>1.8</maven.compiler.target>
   	<maven.compiler.source>1.8</maven.compiler.source>
@@ -38,22 +38,22 @@
   	<dependency>
   		<groupId>org.web3j</groupId>
   		<artifactId>core</artifactId>
-  		<version>5.0.0</version>
+  		<version>4.9.0</version>
   	</dependency>
     <dependency>
         <groupId>org.web3j</groupId>
         <artifactId>geth</artifactId>
-        <version>5.0.0</version>
+        <version>4.9.0</version>
     </dependency>
     <dependency>
         <groupId>org.web3j</groupId>
         <artifactId>contracts</artifactId>
-        <version>5.0.0</version>
+        <version>4.9.0</version>
     </dependency>
     <dependency>
         <groupId>commons-io</groupId>
         <artifactId>commons-io</artifactId>
-        <version>20030203.000550</version>
+        <version>2.11.0</version>
     </dependency>
   	<dependency>
   		<groupId>org.spigotmc</groupId>
@@ -61,18 +61,27 @@
   		<version>1.8.8-R0.1-SNAPSHOT</version>
   		<scope>compile</scope>
   	</dependency>
-  	<dependency>
+      <dependency>
   		<groupId>org.bitcoinj</groupId>
   		<artifactId>bitcoinj-core</artifactId>
   		<version>0.16.1</version>
   	</dependency>
+      <dependency>
+          <groupId>org.json</groupId>
+          <artifactId>json</artifactId>
+          <version>20211205</version>
+      </dependency>
   	<dependency>
   		<groupId>com.google.guava</groupId>
   		<artifactId>guava</artifactId>
-        <version>31.0.1-jre</version>
-
+        <version>31.1-jre</version>
     </dependency>
-  	<dependency>
+      <dependency>
+          <groupId>com.google.code.gson</groupId>
+          <artifactId>gson</artifactId>
+          <version>2.9.0</version>
+      </dependency>
+      <dependency>
   		<groupId>org.xerial</groupId>
   		<artifactId>sqlite-jdbc</artifactId>
   		<version>3.36.0.3</version>
