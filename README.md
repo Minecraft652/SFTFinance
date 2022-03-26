@@ -8,7 +8,7 @@
 
 SFTFinance Is a minecraft server plug-in based on Bukkit/Spigot
 
-Its features provide players and administrators with operations on the Ethereum blockchain and smart contracts
+Its features provide players and administrators with operations on the EVM-Compatible blockchain and smart contracts
 
 Tokens that allow interaction between original tokens and ERC20 standard tokens smart contracts.(Like Ether,USDT)
 
