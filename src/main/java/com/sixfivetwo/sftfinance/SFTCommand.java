@@ -1,10 +1,12 @@
 package com.sixfivetwo.sftfinance;
 
 import com.sixfivetwo.sftfinance.datalibrary.*;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.web3j.crypto.Credentials;
@@ -27,6 +29,7 @@ public class SFTCommand implements CommandExecutor {
                 if (command.getName().equals("wallet")) {
                     PlayerWalletData commander = new PlayerWalletData(commandSender.getName());
                     List<String> message = new ArrayList<>();
+                    List<net.md_5.bungee.api.chat.TextComponent> interactiveMessage = new ArrayList<>();
                     switch (args.length) {
                         case 0:
                             if (!commander.has) {
@@ -34,15 +37,19 @@ public class SFTCommand implements CommandExecutor {
                                 return;
                             }
                             String balance = String.valueOf(APILibrary.getEthBalance(commander.fromaddress, true));
-                            message.add(Main.SFTInfo + Main.prop.getProperty("YourAddress") + commander.fromaddress);
-                            message.add(Main.SFTInfo + Main.prop.getProperty("YourBalance") + balance + " " + Main.chainlibrary.symbol);
+                            interactiveMessage.add(APILibrary.textAddEffect(new TextComponent(Main.SFTInfo + Main.prop.getProperty("YourAddress") + commander.fromaddress), commander.fromaddress));
+                            interactiveMessage.add(APILibrary.textAddEffect(new TextComponent(Main.SFTInfo + Main.prop.getProperty("YourBalance") + balance + " " + Main.chainlibrary.symbol), balance));
                             for (Entry<String, Map<Integer, String>> ERC20Map : Main.ERC20ContractMap.entrySet()) {
                                 ERC20ContractData ERC20Data = new ERC20ContractData(Main.ERC20ContractMap.get(ERC20Map.getKey()), Main.chainlibrary);
                                 BigDecimal sftbalance = new BigDecimal(APILibrary.getERC20Balance(ERC20Data, commander, commander.fromaddress)).divide(new BigDecimal(ERC20Data.decimal));
-                                message.add(Main.SFTInfo + Main.prop.getProperty("YourBalance") + sftbalance + " " + ERC20Data.symbol);
+                                interactiveMessage.add(APILibrary.textAddEffect(new TextComponent(Main.SFTInfo + Main.prop.getProperty("YourBalance") + sftbalance + " " + ERC20Data.symbol), sftbalance.toString()));
                             }
-                            message.add(Main.SFTInfo + Main.prop.getProperty("HelpPage"));
-                            APILibrary.playerSendMessage(commandSender, message);
+                            interactiveMessage.add(APILibrary.textAddEffect(new TextComponent(Main.SFTInfo + Main.prop.getProperty("HelpPage")), "/wallet help"));
+                            if (commandSender instanceof ConsoleCommandSender) {
+                                APILibrary.playerSendInteractiveMessage((ConsoleCommandSender) commandSender, interactiveMessage);
+                            } else {
+                                APILibrary.playerSendInteractiveMessage(commandSender, interactiveMessage);
+                            }
                             return;
                         case 1:
                             if (args[0].equals("help")) {
@@ -71,10 +78,10 @@ public class SFTCommand implements CommandExecutor {
                                     commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("Notreg"));
                                     return;
                                 }
-                                message.add(Main.SFTInfo + Main.prop.getProperty("keywarning"));
-                                message.add(Main.SFTInfo + Main.prop.getProperty("Privatekey") + commander.privatekey);
-                                message.add(Main.SFTInfo + Main.prop.getProperty("Seed") + commander.seed);
-                                APILibrary.playerSendMessage(commandSender, message);
+                                interactiveMessage.add(APILibrary.textAddEffect(new TextComponent(Main.SFTInfo + Main.prop.getProperty("keywarning")), ""));
+                                interactiveMessage.add(APILibrary.textAddEffect(new TextComponent(Main.SFTInfo + Main.prop.getProperty("Privatekey")+ commander.privatekey), commander.privatekey));
+                                interactiveMessage.add(APILibrary.textAddEffect(new TextComponent(Main.SFTInfo + Main.prop.getProperty("Seed") + commander.seed), commander.seed));
+                                APILibrary.playerSendInteractiveMessage(commandSender, interactiveMessage);
                                 return;
                             }
                             if (args[0].equals("create")) {
@@ -82,9 +89,16 @@ public class SFTCommand implements CommandExecutor {
                                     Player commandSenderPlayer = (Player) commandSender;
                                     String UUID = commandSenderPlayer.getUniqueId().toString();
                                     String PlayerID = commandSenderPlayer.getName();
-                                    if (APILibrary.createWallet(UUID, PlayerID)) {
-                                        commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("Createwalletsuccess"));
-                                        return;
+                                    if (Main.fileconfig.getBoolean("LegacyWalletGenerator")) {
+                                        if (APILibrary.legacyCreateWallet(UUID, PlayerID, Main.legacyDirectory)) {
+                                            commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("Createwalletsuccess"));
+                                            return;
+                                        }
+                                    } else {
+                                        if (APILibrary.createWallet(UUID, PlayerID)) {
+                                            commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("Createwalletsuccess"));
+                                            return;
+                                        }
                                     }
                                     commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("Createwalletfail"));
                                     return;
@@ -121,8 +135,9 @@ public class SFTCommand implements CommandExecutor {
                                     commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("Notreg"));
                                     return;
                                 }
-                                commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("Privatekey") + commander.privatekey);
-                                commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("Seed") + commander.seed);
+                                interactiveMessage.add(APILibrary.textAddEffect(new TextComponent(Main.SFTInfo + Main.prop.getProperty("Privatekey") + commander.privatekey), commander.privatekey));
+                                interactiveMessage.add(APILibrary.textAddEffect(new TextComponent(Main.SFTInfo + Main.prop.getProperty("Seed") + commander.seed), commander.seed));
+                                APILibrary.playerSendInteractiveMessage(commandSender, interactiveMessage);
                                 if (APILibrary.deleteData(commander.playerid)) {
                                     commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("successdelete"));
                                     return;
@@ -131,18 +146,8 @@ public class SFTCommand implements CommandExecutor {
                             }
                         case 2:
                             if (args[0].equals("help")) {
-                                if (args[1].equals("1")) {
-                                    APILibrary.playerSendMessage(commandSender, APILibrary.getHelpData("1", message));
-                                    return;
-                                }
-                                if (args[1].equals("2")) {
-                                    APILibrary.playerSendMessage(commandSender, APILibrary.getHelpData("2", message));
-                                    return;
-                                }
-                                if (args[1].equals("3")) {
-                                    APILibrary.playerSendMessage(commandSender, APILibrary.getHelpData("3", message));
-                                    return;
-                                }
+                                APILibrary.playerSendMessage(commandSender, APILibrary.getHelpData(args[1], message));
+                                return;
                             }
                             if (args[0].equals("player")) {
                                 if (!commander.has) {
@@ -151,14 +156,18 @@ public class SFTCommand implements CommandExecutor {
                                 }
                                 PlayerWalletData playerwallet = new PlayerWalletData(args[1]);
                                 String ethbalance = String.valueOf(APILibrary.getEthBalance(playerwallet.fromaddress, true));
-                                message.add(Main.SFTInfo + Main.prop.getProperty("TargetAddress") + playerwallet.fromaddress);
-                                message.add(Main.SFTInfo + Main.prop.getProperty("TargetBalance") + ethbalance + " " + Main.chainlibrary.symbol);
+                                interactiveMessage.add(APILibrary.textAddEffect(new TextComponent(Main.SFTInfo + Main.prop.getProperty("TargetAddress") + playerwallet.fromaddress), playerwallet.fromaddress));
+                                interactiveMessage.add(APILibrary.textAddEffect(new TextComponent(Main.SFTInfo + Main.prop.getProperty("TargetBalance") + ethbalance + " " + Main.chainlibrary.symbol), ethbalance));
                                 for (Entry<String, Map<Integer, String>> ERC20Map : Main.ERC20ContractMap.entrySet()) {
                                     ERC20ContractData ERC20Data = new ERC20ContractData(Main.ERC20ContractMap.get(ERC20Map.getKey()), Main.chainlibrary);
-                                    BigDecimal balances = new BigDecimal(APILibrary.getERC20Balance(ERC20Data, commander, commander.fromaddress)).divide(new BigDecimal(ERC20Data.decimal));
-                                    message.add(Main.SFTInfo + Main.prop.getProperty("TargetBalance") + balances + " " + ERC20Data.symbol);
+                                    BigDecimal balances = new BigDecimal(APILibrary.getERC20Balance(ERC20Data, playerwallet, playerwallet.fromaddress)).divide(new BigDecimal(ERC20Data.decimal));
+                                    interactiveMessage.add(APILibrary.textAddEffect(new TextComponent(Main.SFTInfo + Main.prop.getProperty("TargetBalance") + balances + " " + ERC20Data.symbol), balances.toString()));
                                 }
-                                APILibrary.playerSendMessage(commandSender, message);
+                                if (commandSender instanceof ConsoleCommandSender) {
+                                    APILibrary.playerSendInteractiveMessage((ConsoleCommandSender) commandSender, interactiveMessage);
+                                } else {
+                                    APILibrary.playerSendInteractiveMessage(commandSender, interactiveMessage);
+                                }
                                 return;
                             }
                             if (args[0].equals("exchange")) {
@@ -167,7 +176,7 @@ public class SFTCommand implements CommandExecutor {
                                     return;
                                 }
                                 String Type = args[1];
-                                String Message = APILibrary.checkLegalExchange(Type, commander, commandSender);
+                                String Message = APILibrary.checkLegalExchange(Type, commander, commandSender, Main.ConsoleWallet.fromaddress);
                                 message.add(Main.SFTInfo + Main.prop.getProperty(Message));
                                 APILibrary.playerSendMessage(commandSender, message);
                                 return;
@@ -184,7 +193,7 @@ public class SFTCommand implements CommandExecutor {
                                 String PrivateKey = args[1];
                                 try {
                                     Credentials creds = APILibrary.getCredential(PrivateKey);
-                                    if (commandSender.getName().equals("CONSOLE")) {
+                                    if (commandSender instanceof ConsoleCommandSender) {
                                         if (commander.playerid.equals("CONSOLE")) {
                                             APILibrary.insertData("00000000-0000-0000-0000-000000000000", "CONSOLE", "0", creds.getAddress(), PrivateKey, "0");
                                             commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("importsuccess"));
@@ -192,11 +201,33 @@ public class SFTCommand implements CommandExecutor {
                                         }
                                     }
                                     Player player = Bukkit.getPlayer(commandSender.getName());
-                                    APILibrary.insertData(String.valueOf(player.getUniqueId()), player.getName(), "0", creds.getAddress(), PrivateKey, "0");
+                                    APILibrary.insertData( String.valueOf(player.getUniqueId()), player.getName(), "0", creds.getAddress(), PrivateKey, "0");
                                     commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("importsuccess"));
                                     return;
                                 } catch (Exception ex) {
                                     commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("errorprivatekey"));
+                                    return;
+                                }
+                            }
+                            if (args[0].equals("trade")) {
+                                if (APILibrary.checkTradeAvailable(commandSender, commander)) return;
+                                if (commandSender instanceof ConsoleCommandSender) {
+                                    if (commander.playerid.equals("CONSOLE")) {
+                                        commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("consoledeny"));
+                                        return;
+                                    }
+                                }
+                                if (args[1].equals("list")) {
+                                    List<String> from = APILibrary.getTradeList(1, commander.playerid, Main.conn);
+                                    List<String> to = APILibrary.getTradeList(2, commander.playerid, Main.conn);
+                                    List<String> fromDeny = APILibrary.getTradeList(3, commander.playerid, Main.conn);
+                                    message.add(Main.SFTInfo + Main.prop.getProperty("yourfromlist"));
+                                    message.add(Main.SFTInfo + String.join(",", from));
+                                    message.add(Main.SFTInfo + Main.prop.getProperty("yourtolist"));
+                                    message.add(Main.SFTInfo + String.join(",", to));
+                                    message.add(Main.SFTInfo + Main.prop.getProperty("yourfromdenylist"));
+                                    message.add(Main.SFTInfo + String.join(",", fromDeny));
+                                    APILibrary.playerSendMessage(commandSender, message);
                                     return;
                                 }
                             }
@@ -218,6 +249,68 @@ public class SFTCommand implements CommandExecutor {
                                 }
                                 commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("Help"));
                                 return;
+                            }
+                            if (args[0].equals("trade")) {
+                                if (APILibrary.checkTradeAvailable(commandSender, commander)) return;
+                                int id = Integer.parseInt(args[2]);
+                                if (args[1].equals("info")) {
+                                    if (APILibrary.checkDealAcceptDenyPermission(commandSender, "all", commander.playerid, id, Main.conn)) {
+                                        commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("permissiondeny"));
+                                        return;
+                                    }
+                                    PlayerDealData pdd = new PlayerDealData(id, Main.conn);
+                                    APILibrary.sendMessageInfo(commandSender, message, pdd);
+                                    return;
+                                }
+                                if (args[1].equals("edit")) {
+                                    if (APILibrary.checkDealAcceptDenyPermission(commandSender, "from", commander.playerid, id, Main.conn)) {
+                                        commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("permissiondeny"));
+                                        return;
+                                    }
+                                    PlayerDealData pdd = new PlayerDealData(id, Main.conn);
+                                    Bukkit.getScheduler().runTask(Main.getPlugin(Main.class), () -> {
+                                        Bukkit.getPlayer(commander.playerid).openInventory(APILibrary.createCustomInventory(new InventoryHolderEditData(id), pdd.details));
+                                    });
+                                    return;
+                                }
+                                if (args[1].equals("accept")) {
+                                    if (APILibrary.checkDealAcceptDenyPermission(commandSender, "to", commander.playerid, id, Main.conn)) {
+                                        commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("permissiondeny"));
+                                        return;
+                                    }
+                                    PlayerDealData pdd = new PlayerDealData(id, Main.conn);
+                                    if (APILibrary.executeTrade(pdd, pdd.toid, commandSender)) {
+                                        interactiveMessage.add(APILibrary.textAddEffect(new TextComponent(Main.SFTInfo + Main.prop.getProperty("acceptdealsuccess")), "/wallet trade edit " + pdd.id));
+                                        interactiveMessage.add(APILibrary.textAddEffect(new TextComponent(Main.SFTInfo + Main.prop.getProperty("acceptdealsuccessa") + pdd.id), "/wallet trade edit " + pdd.id));
+                                        Bukkit.getScheduler().runTask(Main.getPlugin(Main.class), () -> {
+                                            try {
+                                                Bukkit.getPlayer(pdd.fromid.playerid).sendMessage(Main.SFTInfo + Main.prop.getProperty("acceptdealsuccessb") + pdd.id);
+                                            } catch (Exception ignored) {}
+                                        });
+                                        APILibrary.playerSendInteractiveMessage(commandSender, interactiveMessage);
+                                        return;
+                                    }
+                                    interactiveMessage.add(APILibrary.textAddEffect(new TextComponent(Main.SFTInfo + Main.prop.getProperty("acceptdealfail")), "/wallet trade info " + pdd.id));
+                                    interactiveMessage.add(APILibrary.textAddEffect(new TextComponent(Main.SFTInfo + Main.prop.getProperty("acceptdealfaila") + pdd.id), "/wallet trade info " + pdd.id));
+                                    Bukkit.getScheduler().runTask(Main.getPlugin(Main.class), () -> {
+                                        try {
+                                            Bukkit.getPlayer(pdd.fromid.playerid).sendMessage(Main.SFTInfo + Main.prop.getProperty("acceptdealfailb") + pdd.id);
+                                            Bukkit.getPlayer(pdd.fromid.playerid).sendMessage(Main.SFTInfo + Main.prop.getProperty("acceptdealfaila") + pdd.id);
+                                        } catch (Exception ignored) {}
+                                    });
+                                    APILibrary.playerSendInteractiveMessage(commandSender, interactiveMessage);
+                                    return;
+                                }
+                                if (args[1].equals("deny")) {
+                                    if (APILibrary.checkDealAcceptDenyPermission(commandSender, "all", commander.playerid, id, Main.conn)) {
+                                        commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("permissiondeny"));
+                                        return;
+                                    }
+                                    PlayerDealData pdd = new PlayerDealData(id, Main.conn);
+                                    pdd.denyDeal(Main.conn);
+                                    commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("denydealsuccess"));
+                                    return;
+                                }
                             }
                         case 4:
                             if (!commander.has) {
@@ -248,6 +341,35 @@ public class SFTCommand implements CommandExecutor {
                             if (args[0].equals("approve")) {
                                 ReceiptData rd = new ReceiptData(args[1], "null", args[2], args[3], "null", args[4]);
                                 if (APILibrary.executeApprove(commander, rd, commandSender)) return;
+                            }
+                            if (args[0].equals("trade")) {
+                                if (APILibrary.checkTradeAvailable(commandSender, commander)) return;
+                                if (APILibrary.checkSelf(commandSender, args[1])) return;
+                                if (commander.playerid.equals(args[1])) {
+                                    commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("Help"));
+                                    return;
+                                }
+                                if (commandSender instanceof ConsoleCommandSender) {
+                                    if (commander.playerid.equals("CONSOLE")) {
+                                        commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("consoledeny"));
+                                        return;
+                                    }
+                                }
+                                PlayerWalletData playerWalletData = new PlayerWalletData(args[1]);
+                                String tokenType = APILibrary.CheckTokenType(args[2]);
+                                String value = args[3];
+                                if ("null".equals(tokenType)) {
+                                    commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("errortokentype"));
+                                    return;
+                                }
+                                if (!playerWalletData.has) {
+                                    commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("targetnotreg"));
+                                    return;
+                                }
+                                Bukkit.getScheduler().runTask(Main.getPlugin(Main.class), () -> {
+                                    Bukkit.getPlayer(commander.playerid).openInventory(APILibrary.createInventory(new InventoryHolderData(tokenType, commander, playerWalletData, value)));
+                                });
+                                return;
                             }
                         case 6:
                             if (!commander.has) {

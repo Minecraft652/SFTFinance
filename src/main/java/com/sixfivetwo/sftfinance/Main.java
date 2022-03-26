@@ -1,12 +1,16 @@
 package com.sixfivetwo.sftfinance;
 
 import com.sixfivetwo.sftfinance.datalibrary.*;
+import com.sixfivetwo.sftfinance.listener.ContainerListener;
+import com.sixfivetwo.sftfinance.listener.InventoryCloseListener;
+import com.sixfivetwo.sftfinance.listener.SFTListener;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.util.HashMap;
@@ -15,9 +19,9 @@ import java.util.Objects;
 import java.util.Properties;
 
 public class Main extends JavaPlugin {
-    final static String SFTInfo = "§a[§6SFT§cFinance§a] §r";
-    final static String Thanks = "————————————————\nThank you for using SFTFinance,It is my first java project\nIf you want to support me,This is my ethereum address : 0x5b615F1a1989ee2636BfbFe471B1F66bCa16F926\nSupport link: https://github.com/Minecraft652/SFTFinance\nI would love to be your friend!Enjoy your use![Smile]\nDear ServerManager —— Minecraft_652n————————————————";
-    final static String ThanksZh = "————————————————\n感谢您使用 SFTFinance,这是我的第一个Java项目\n如果您想支持我一下,这是我的以太坊地址 : 0x5b615F1a1989ee2636BfbFe471B1F66bCa16F926 \n支持链接 : https://github.com/Minecraft652/SFTFinance\n我很乐意跟你交朋友！享受SFTFinance吧[微笑]\n亲爱的服务器管理员 —— Minecraft_652\n——————————————";
+    public final static String SFTInfo = "§a[§6SFT§cFinance§a] §r";
+    public final static String Thanks = "————————————————\nThank you for using SFTFinance,It is my first java project\nIf you want to support me,This is my ethereum address : 0x5b615F1a1989ee2636BfbFe471B1F66bCa16F926\nSupport link: https://github.com/Minecraft652/SFTFinance\nI would love to be your friend!Enjoy your use![Smile]\nDear ServerManager —— Minecraft_652n————————————————";
+    public final static String ThanksZh = "————————————————\n感谢您使用 SFTFinance,这是我的第一个Java项目\n如果您想支持我一下,这是我的以太坊地址 : 0x5b615F1a1989ee2636BfbFe471B1F66bCa16F926 \n支持链接 : https://github.com/Minecraft652/SFTFinance\n我很乐意跟你交朋友！享受SFTFinance吧[微笑]\n亲爱的服务器管理员 —— Minecraft_652\n——————————————";
     public static Connection conn;
     public static Properties prop;
     public static BlockchainData chainlibrary;
@@ -25,6 +29,7 @@ public class Main extends JavaPlugin {
     public static FileConfiguration fileexchange;
     public static FileConfiguration filecontract;
     public static FileConfiguration filehelp;
+    public static File legacyDirectory;
     public static Map<String, Map<Integer, String>> ERC20ContractMap;
     public static Map<String, Map<Integer, String>> ExchangeMap;
     public static Map<String, Map<Integer, String>> HelpPageMap;
@@ -69,8 +74,13 @@ public class Main extends JavaPlugin {
             InternalFileMaps.put("en_US.properties", getResource("en_US.properties"));
             InternalFileMaps.put("ru_RU.properties", getResource("ru_RU.properties"));
 
+            legacyDirectory = new File(getDataFolder().toString() + "/Legacy");
+
             if (!getDataFolder().exists()) {
                 getDataFolder().mkdir();
+            }
+            if (!legacyDirectory.exists()) {
+                legacyDirectory.mkdir();
             }
 
             for (String keySet : FileMaps.keySet()) {
@@ -103,75 +113,49 @@ public class Main extends JavaPlugin {
             }
 
             if (Objects.requireNonNull(fileconfig.getString("Language")).contains("zh")) {
-                filehelp = YamlConfiguration.loadConfiguration(zhhelpfile);
-                for (String helproot : filehelp.getKeys(false)) {
-                    Map<Integer, String> FileMapHelp = new HashMap<>();
-                    FileMapHelp.put(1, filehelp.getString(helproot + ".front"));
-                    FileMapHelp.put(2, filehelp.getString(helproot + ".comment1"));
-                    FileMapHelp.put(3, filehelp.getString(helproot + ".comment2"));
-                    FileMapHelp.put(4, filehelp.getString(helproot + ".comment3"));
-                    FileMapHelp.put(5, filehelp.getString(helproot + ".comment4"));
-                    FileMapHelp.put(6, filehelp.getString(helproot + ".comment5"));
-                    FileMapHelp.put(7, filehelp.getString(helproot + ".comment6"));
-                    FileMapHelp.put(8, filehelp.getString(helproot + ".comment7"));
-                    FileMapHelp.put(9, filehelp.getString(helproot + ".comment8"));
-                    FileMapHelp.put(10, filehelp.getString(helproot + ".comment9"));
-                    FileMapHelp.put(11, filehelp.getString(helproot + ".comment10"));
-                    HelpPageMap.put(helproot, FileMapHelp);
-                }
+                APILibrary.loadHelpFile(zhhelpfile, filehelp, HelpPageMap);
             } else if (Objects.requireNonNull(fileconfig.getString("Language")).contains("ru")) {
-                filehelp = YamlConfiguration.loadConfiguration(ruhelpfile);
-                for (String helproot : filehelp.getKeys(false)) {
-                    Map<Integer, String> FileMapHelp = new HashMap<>();
-                    FileMapHelp.put(1, filehelp.getString(helproot + ".front"));
-                    FileMapHelp.put(2, filehelp.getString(helproot + ".comment1"));
-                    FileMapHelp.put(3, filehelp.getString(helproot + ".comment2"));
-                    FileMapHelp.put(4, filehelp.getString(helproot + ".comment3"));
-                    FileMapHelp.put(5, filehelp.getString(helproot + ".comment4"));
-                    FileMapHelp.put(6, filehelp.getString(helproot + ".comment5"));
-                    FileMapHelp.put(7, filehelp.getString(helproot + ".comment6"));
-                    FileMapHelp.put(8, filehelp.getString(helproot + ".comment7"));
-                    FileMapHelp.put(9, filehelp.getString(helproot + ".comment8"));
-                    FileMapHelp.put(10, filehelp.getString(helproot + ".comment9"));
-                    FileMapHelp.put(11, filehelp.getString(helproot + ".comment10"));
-                    HelpPageMap.put(helproot, FileMapHelp);
-                }
+                APILibrary.loadHelpFile(ruhelpfile, filehelp, HelpPageMap);
             } else {
-                filehelp = YamlConfiguration.loadConfiguration(enhelpfile);
-                for (String helproot : filehelp.getKeys(false)) {
-                    Map<Integer, String> FileMapHelp = new HashMap<>();
-                    FileMapHelp.put(1, filehelp.getString(helproot + ".front"));
-                    FileMapHelp.put(2, filehelp.getString(helproot + ".comment1"));
-                    FileMapHelp.put(3, filehelp.getString(helproot + ".comment2"));
-                    FileMapHelp.put(4, filehelp.getString(helproot + ".comment3"));
-                    FileMapHelp.put(5, filehelp.getString(helproot + ".comment4"));
-                    FileMapHelp.put(6, filehelp.getString(helproot + ".comment5"));
-                    FileMapHelp.put(7, filehelp.getString(helproot + ".comment6"));
-                    FileMapHelp.put(8, filehelp.getString(helproot + ".comment7"));
-                    FileMapHelp.put(9, filehelp.getString(helproot + ".comment8"));
-                    FileMapHelp.put(10, filehelp.getString(helproot + ".comment9"));
-                    FileMapHelp.put(11, filehelp.getString(helproot + ".comment10"));
-                    HelpPageMap.put(helproot, FileMapHelp);
-                }
+                APILibrary.loadHelpFile(enhelpfile, filehelp, HelpPageMap);
             }
 
             prop = new Properties();
-            InputStream in = getResource(Objects.requireNonNull(fileconfig.getString("Language")));
+            InputStream in = new FileInputStream(new File(getDataFolder(), fileconfig.getString("Language")));
             prop.load(in);
+
             try {
                 if (fileconfig.getBoolean("IsMysql")) {
                     String user = fileconfig.getString("MysqlUser");
                     String pass = fileconfig.getString("MysqlPassword");
                     String url = "jdbc:" + fileconfig.getString("MysqlUrl");
                     conn = APILibrary.getConnection("mysql", url, user, pass);
-                    APILibrary.createWallet("00000000-0000-0000-0000-000000000000", "CONSOLE");
+                    if (Main.fileconfig.getBoolean("LegacyWalletGenerator")) {
+                        APILibrary.legacyCreateWallet("00000000-0000-0000-0000-000000000000", "CONSOLE", Main.legacyDirectory);
+                    } else {
+                        APILibrary.createWallet("00000000-0000-0000-0000-000000000000", "CONSOLE");
+                    }
+                    if (fileconfig.getBoolean("playerCanTradeEachOther")) {
+                        APILibrary.createTradeTable("mysql", conn);
+                    }
                 } else {
                     String url = "jdbc:sqlite:" + walletfile.toString();
                     conn = APILibrary.getConnection("sqlite", url, "null", "null");
-                    APILibrary.createWallet("00000000-0000-0000-0000-000000000000", "CONSOLE");
+                    if (Main.fileconfig.getBoolean("LegacyWalletGenerator")) {
+                        APILibrary.legacyCreateWallet("00000000-0000-0000-0000-000000000000", "CONSOLE", Main.legacyDirectory);
+                    } else {
+                        APILibrary.createWallet("00000000-0000-0000-0000-000000000000", "CONSOLE");
+                    }
+                    if (fileconfig.getBoolean("playerCanTradeEachOther")) {
+                        APILibrary.createTradeTable("sqlite", conn);
+                    }
                 }
-            } catch (Exception ex) {
-                ex.printStackTrace();
+            } catch (NoSuchMethodError ex) {
+                System.out.println(Main.prop.getProperty("error"));
+                System.out.println(Main.prop.getProperty("error"));
+                System.out.println(Main.prop.getProperty("error"));
+                System.out.println(Main.prop.getProperty("error"));
+                System.out.println(Main.prop.getProperty("error"));
             }
 
             chainlibrary = new BlockchainData(fileconfig.getString("ChainName"), fileconfig.getString("HttpUrl"), fileconfig.getLong("ChainID"), fileconfig.getString("Symbol"));
@@ -180,6 +164,9 @@ public class Main extends JavaPlugin {
             if (fileconfig.getBoolean("OnPlayerLoginRegisterWallet")) {
                 Bukkit.getServer().getPluginManager().registerEvents(new SFTListener(), this);
             }
+
+            Bukkit.getServer().getPluginManager().registerEvents(new ContainerListener(), this);
+            Bukkit.getServer().getPluginManager().registerEvents(new InventoryCloseListener(), this);
 
             Objects.requireNonNull(Bukkit.getPluginCommand("wallet")).setExecutor(new SFTCommand());
 
@@ -199,7 +186,11 @@ public class Main extends JavaPlugin {
                     "".equals(fileconfig.getString("ChainName")) ||
                     "".equals(fileconfig.getString("ChainID")) ||
                     "".equals(fileconfig.getString("OnPlayerLoginRegisterWallet")) ||
+                    "".equals(fileconfig.getString("LegacyWalletGenerator")) ||
                     "".equals(fileconfig.getString("playerCanImportTheyOwnWallet")) ||
+                    "".equals(fileconfig.getString("playerCanTradeEachOther")) ||
+                    "".equals(fileconfig.getString("TradeWorldLimit")) ||
+                    "".equals(fileconfig.getString("LimitedWorld")) ||
                     "".equals(fileconfig.getString("IsMysql")) ||
                     "".equals(fileconfig.getString("MysqlUrl")) ||
                     "".equals(fileconfig.getString("MysqlUser")) ||
@@ -212,7 +203,11 @@ public class Main extends JavaPlugin {
                     null == fileconfig.getString("ChainName") ||
                     null == fileconfig.getString("ChainID") ||
                     null == fileconfig.getString("OnPlayerLoginRegisterWallet") ||
+                    null == fileconfig.getString("LegacyWalletGenerator") ||
                     null == fileconfig.getString("playerCanImportTheyOwnWallet") ||
+                    null == fileconfig.getString("playerCanTradeEachOther") ||
+                    null == fileconfig.getString("TradeWorldLimit") ||
+                    null == fileconfig.getString("LimitedWorld") ||
                     null == fileconfig.getString("IsMysql") ||
                     null == fileconfig.getString("MysqlUrl") ||
                     null == fileconfig.getString("MysqlUser") ||
@@ -222,6 +217,16 @@ public class Main extends JavaPlugin {
                 System.out.println(Main.prop.getProperty("updateconfig"));
                 System.out.println(Main.prop.getProperty("updateconfig"));
                 System.out.println(Main.prop.getProperty("updateconfig"));
+            }
+
+            if (Bukkit.getVersion().contains("1.8")) {
+                if (!fileconfig.getBoolean("LegacyWalletGenerator")) {
+                    System.out.println(Main.prop.getProperty("legacyversion"));
+                    System.out.println(Main.prop.getProperty("legacyversion"));
+                    System.out.println(Main.prop.getProperty("legacyversion"));
+                    System.out.println(Main.prop.getProperty("legacyversion"));
+                    System.out.println(Main.prop.getProperty("legacyversion"));
+                }
             }
 
         } catch (Exception ex) {

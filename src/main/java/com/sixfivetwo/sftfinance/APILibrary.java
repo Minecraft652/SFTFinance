@@ -1,13 +1,26 @@
 package com.sixfivetwo.sftfinance;
 
-import com.sixfivetwo.sftfinance.datalibrary.*;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
+import com.sixfivetwo.sftfinance.datalibrary.*;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bitcoinj.crypto.*;
 import org.bitcoinj.wallet.DeterministicSeed;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.web3j.contracts.eip20.generated.ERC20;
 import org.web3j.crypto.*;
@@ -28,10 +41,8 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.sql.*;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Objects;
 
 public class APILibrary {
     final static ImmutableList<ChildNumber> BIP44_ETH_ACCOUNT_ZERO_PATH =
@@ -53,35 +64,49 @@ public class APILibrary {
         }
     }
 
-    public static Connection getConnection(String type, String url, String user, String pass) throws SQLException {
-        try {
-            if (type.equals("mysql")) {
-                Class.forName("com.mysql.cj.jdbc.Driver");
-                String nurl = url.replace("SFTFinance", "mysql");
-                Connection nconn = DriverManager.getConnection(nurl, user, pass);
-                Statement statement = nconn.createStatement();
-                statement.execute("create database sftfinance");
-                statement.execute("use sftfinance");
-                statement.execute("create table wallets (UUID varchar(255) primary key, PlayerID varchar(255), Seed varchar(255), Address varchar(255), PrivateKey varchar(255), PublicKey varchar(255))");
-                statement.close();
-                nconn.close();
-                return DriverManager.getConnection(url, user, pass);
-            } else if (type.equals("sqlite")) {
-                Class.forName("org.sqlite.JDBC");
-                Connection conn = DriverManager.getConnection(url);
-                Statement statement = conn.createStatement();
-                statement.executeUpdate("create table wallets (UUID string primary key, PlayerID string, Seed string, Address string, PrivateKey string, PublicKey string)");
-                statement.close();
-                return conn;
-            }
-        } catch (Exception ex) {
-            if (type.equals("mysql")) {
-                return DriverManager.getConnection(url, user, pass);
-            } else if (type.equals("sqlite")) {
-                return DriverManager.getConnection(url);
-            }
+    public static net.md_5.bungee.api.chat.TextComponent textAddEffect(TextComponent textComponent, String content) {
+        textComponent.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, content));
+        textComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new BaseComponent[]{new TextComponent(Main.prop.getProperty("clicktocopy"))}));
+        return textComponent;
+    }
+
+    public static void loadHelpFile(File helpfile, FileConfiguration filehelp, Map<String, Map<Integer, String>> HelpPageMap) {
+        filehelp = YamlConfiguration.loadConfiguration(helpfile);
+        for (String helproot : filehelp.getKeys(false)) {
+            Map<Integer, String> FileMapHelp = new HashMap<>();
+            FileMapHelp.put(1, filehelp.getString(helproot + ".front"));
+            FileMapHelp.put(2, filehelp.getString(helproot + ".comment1"));
+            FileMapHelp.put(3, filehelp.getString(helproot + ".comment2"));
+            FileMapHelp.put(4, filehelp.getString(helproot + ".comment3"));
+            FileMapHelp.put(5, filehelp.getString(helproot + ".comment4"));
+            FileMapHelp.put(6, filehelp.getString(helproot + ".comment5"));
+            FileMapHelp.put(7, filehelp.getString(helproot + ".comment6"));
+            FileMapHelp.put(8, filehelp.getString(helproot + ".comment7"));
+            FileMapHelp.put(9, filehelp.getString(helproot + ".comment8"));
+            FileMapHelp.put(10, filehelp.getString(helproot + ".comment9"));
+            FileMapHelp.put(11, filehelp.getString(helproot + ".comment10"));
+            HelpPageMap.put(helproot, FileMapHelp);
         }
-        return null;
+    }
+
+    public static boolean legacyCreateWallet(String UUID, String PlayerID, File directory) {
+        String walletName = null;
+        try {
+            String password = String.valueOf(new SecureRandom().nextInt(1000000000 - 1));
+            walletName = WalletUtils.generateNewWalletFile(password, directory);
+            Credentials credentials = WalletUtils.loadCredentials(password, new File(directory, walletName));
+            String Address = credentials.getAddress();
+            String PrivateKey = "0x" + credentials.getEcKeyPair().getPrivateKey().toString(16);
+            String MasterPrivateKey = "0";
+            String PublicKey = "0";
+            insertData(UUID, PlayerID, MasterPrivateKey, Address, PrivateKey, PublicKey);
+            new File(directory, walletName).delete();
+            return true;
+        } catch (Exception ex) {
+            return false;
+        } finally {
+            new File(directory, walletName).delete();
+        }
     }
 
     public static boolean createWallet(String UUID, String PlayerID) {
@@ -107,6 +132,72 @@ public class APILibrary {
         return true;
     }
 
+    public static Inventory createInventory(InventoryHolder invd) {
+        Inventory inv = Bukkit.createInventory(invd, 6 * 9 , Main.prop.getProperty("tradegui"));
+        ItemStack barrier = APILibrary.getTargetItem(1);
+        ItemStack emerald_block = APILibrary.getTargetItem(2);
+        ItemStack iron_fence = APILibrary.getTargetItem(3);
+        inv.setItem(53, barrier);
+        inv.setItem(45, emerald_block);
+        inv.setItem(0, iron_fence);
+        inv.setItem(1, iron_fence);
+        inv.setItem(2, iron_fence);
+        inv.setItem(3, iron_fence);
+        inv.setItem(4, iron_fence);
+        inv.setItem(5, iron_fence);
+        inv.setItem(6, iron_fence);
+        inv.setItem(7, iron_fence);
+        inv.setItem(8, iron_fence);
+        inv.setItem(9, iron_fence);
+        inv.setItem(18, iron_fence);
+        inv.setItem(27, iron_fence);
+        inv.setItem(17, iron_fence);
+        inv.setItem(26, iron_fence);
+        inv.setItem(35, iron_fence);
+        inv.setItem(36, iron_fence);
+        inv.setItem(37, iron_fence);
+        inv.setItem(38, iron_fence);
+        inv.setItem(39, iron_fence);
+        inv.setItem(40, iron_fence);
+        inv.setItem(41, iron_fence);
+        inv.setItem(42, iron_fence);
+        inv.setItem(43, iron_fence);
+        inv.setItem(44, iron_fence);
+        inv.setItem(46, iron_fence);
+        inv.setItem(47, iron_fence);
+        inv.setItem(48, iron_fence);
+        inv.setItem(49, iron_fence);
+        inv.setItem(50, iron_fence);
+        inv.setItem(51, iron_fence);
+        inv.setItem(52, iron_fence);
+        return inv;
+    }
+
+    public static Inventory createCustomInventory(InventoryHolder invd, List<ItemStack> details) {
+        Inventory inv = createInventory(invd);
+        for (ItemStack itemStack : details) {
+            inv.addItem(itemStack);
+        }
+        return inv;
+    }
+
+    public static void createTradeTable(String type, Connection conn) throws ClassNotFoundException {
+        try {
+            if (type.equals("mysql")) {
+                Class.forName("com.mysql.cj.jdbc.Driver");
+                PreparedStatement statement = Main.conn.prepareStatement("create table transactions (ID integer NOT NULL PRIMARY KEY AUTO_INCREMENT, fromid varchar(255), toid varchar(255), tokentype varchar(255), value varchar(255), details varchar(255))");
+                statement.executeUpdate();
+                statement.close();
+            } else if (type.equals("sqlite")) {
+                Class.forName("org.sqlite.JDBC");
+                PreparedStatement statement = Main.conn.prepareStatement("create table transactions (ID integer not null primary key autoincrement, fromid string, toid string, tokentype string, value string, details string)");
+                statement.executeUpdate();
+                statement.close();
+            }
+        } catch (SQLException ignored) {
+        }
+    }
+
     public static void insertData(String UUID, String PlayerID, String Seed, String Address, String PrivateKey, String PublicKey) throws SQLException {
         PreparedStatement statement = Main.conn.prepareStatement("insert into wallets values(?,?,?,?,?,?)");
         statement.setString(1, UUID);
@@ -117,6 +208,38 @@ public class APILibrary {
         statement.setString(6, PublicKey);
         statement.executeUpdate();
         statement.close();
+    }
+
+    public static void advancedInsertData(String fromid, String toid, String tokentype, String value, String details) throws SQLException {
+        PreparedStatement statement = Main.conn.prepareStatement("insert into transactions (fromid,toid,tokentype,value,details) values(?,?,?,?,?)");
+        statement.setString(1, fromid);
+        statement.setString(2, toid);
+        statement.setString(3, tokentype);
+        statement.setString(4, value);
+        statement.setString(5, details);
+        statement.executeUpdate();
+        statement.close();
+    }
+
+    public static void advancedUpdateData(int id, String details, Connection conn) throws SQLException {
+        PreparedStatement statement = conn.prepareStatement("update transactions set details = ? where id = ?");
+        statement.setString(1, details);
+        statement.setInt(2, id);
+        statement.executeUpdate();
+        statement.close();
+    }
+
+    public static boolean advancedUpdateData(PlayerDealData pdd, Connection conn) throws SQLException {
+        PreparedStatement statement = conn.prepareStatement("update transactions set fromid = ?, toid = ? where id = ?");
+        statement.setString(1, pdd.toid.playerid);
+        statement.setString(2, "NONE");
+        statement.setInt(3, pdd.id);
+        int line = statement.executeUpdate();
+        statement.close();
+        if (line == 0) {
+            return false;
+        }
+        return true;
     }
 
     public static boolean deleteData(String PlayerID) {
@@ -132,26 +255,6 @@ public class APILibrary {
         }
     }
 
-    public static List<String> getHelpData(String page, List<String> message) {
-        for (Entry<String, Map<Integer, String>> HELPMap : Main.HelpPageMap.entrySet()) {
-            HelpPageData HelpData = new HelpPageData(Main.HelpPageMap.get(HELPMap.getKey()));
-            if (HELPMap.getKey().equals("Page" + page)) {
-                message.add(HelpData.front);
-                message.add(HelpData.comment1);
-                message.add(HelpData.comment2);
-                message.add(HelpData.comment3);
-                message.add(HelpData.comment4);
-                message.add(HelpData.comment5);
-                message.add(HelpData.comment6);
-                message.add(HelpData.comment7);
-                message.add(HelpData.comment8);
-                message.add(HelpData.comment9);
-                message.add(HelpData.comment10);
-            }
-        }
-        return message;
-    }
-
     public static boolean executeCommand(Player player, String command, boolean isOp) {
         player.setOp(true);
         player.chat(command);
@@ -163,6 +266,53 @@ public class APILibrary {
         for (String message : messageList) {
             commandSender.sendMessage(message);
         }
+    }
+
+    public static void playerSendInteractiveMessage(CommandSender commandSender, List<TextComponent> messageList) {
+        for (TextComponent message : messageList) {
+            Player player = (Player) commandSender;
+            player.spigot().sendMessage(message);
+        }
+    }
+
+    public static void playerSendInteractiveMessage(ConsoleCommandSender commandSender, List<TextComponent> messageList) {
+        for (TextComponent message : messageList) {
+            commandSender.sendMessage(message.toPlainText());
+        }
+    }
+
+    public static void sendMessageFromToPlayer(InventoryHolderData invd, int id) {
+        List<String> fromMessage = new ArrayList<>();
+        List<String> toMessage = new ArrayList<>();
+        fromMessage.add(Main.SFTInfo + Main.prop.getProperty("nofityfrom") + id);
+        fromMessage.add(Main.SFTInfo + Main.prop.getProperty("nofityfroma") + id);
+        toMessage.add(Main.SFTInfo + Main.prop.getProperty("nofityto") + id);
+        toMessage.add(Main.SFTInfo + Main.prop.getProperty("nofitytoc") + invd.type);
+        toMessage.add(Main.SFTInfo + Main.prop.getProperty("nofitytod") + invd.value);
+        toMessage.add(Main.SFTInfo + Main.prop.getProperty("nofitytoa") + id);
+        toMessage.add(Main.SFTInfo + Main.prop.getProperty("nofitytob") + id);
+        invd.nofity(fromMessage, toMessage);
+    }
+
+    public static void sendMessageFromToPlayerUpdate(InventoryHolderEditData invd, PlayerWalletData fromid, PlayerWalletData toid) {
+        List<String> fromMessage = new ArrayList<>();
+        List<String> toMessage = new ArrayList<>();
+        fromMessage.add(Main.SFTInfo + Main.prop.getProperty("nofityupdatefrom") + invd.id);
+        fromMessage.add(Main.SFTInfo + Main.prop.getProperty("nofityfroma") + invd.id);
+        toMessage.add(Main.SFTInfo + Main.prop.getProperty("nofityupdateto") + invd.id);
+        toMessage.add(Main.SFTInfo + Main.prop.getProperty("nofitytoa") + invd.id);
+        toMessage.add(Main.SFTInfo + Main.prop.getProperty("nofitytob") + invd.id);
+        invd.nofity(fromMessage, toMessage, fromid, toid);
+    }
+
+    public static void sendMessageInfo(CommandSender commandSender, List<String> message, PlayerDealData pdd) {
+        message.add(Main.SFTInfo + Main.prop.getProperty("dealid") + pdd.id);
+        message.add(Main.SFTInfo + Main.prop.getProperty("dealtokentype") + pdd.type);
+        message.add(Main.SFTInfo + Main.prop.getProperty("dealvalue") + pdd.value);
+        message.add(Main.SFTInfo + Main.prop.getProperty("dealfromid") + pdd.fromid.playerid);
+        message.add(Main.SFTInfo + Main.prop.getProperty("dealtoid") + pdd.toid.playerid);
+        message.add(Main.SFTInfo + Main.prop.getProperty("dealitem") + String.join(",", pdd.strListItem()));
+        APILibrary.playerSendMessage(commandSender, message);
     }
 
     public static boolean sendSFTTransaction(@NotNull CommandSender commandSender, PlayerWalletData commander, ReceiptData rd, ERC20ContractData contractData) throws Exception {
@@ -200,20 +350,151 @@ public class APILibrary {
             commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("donterror"));
             return true;
         }
-        commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("TransferSuccess") + "\n\u00a7a" + Main.fileconfig.getString("ExplorerUrl") + transactionHash);
+        commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("TransferSuccess") + Main.fileconfig.getString("ExplorerUrl") + transactionHash);
         return true;
     }
 
     public static String getVersion() {
         try {
             if (Objects.requireNonNull(Main.fileconfig.getString("Language")).contains("zh")) {
-                return Main.SFTInfo + "§a Release1.5.1, 作者保留所有权利";
+                return Main.SFTInfo + "§a Release1.6, 保留所有权利";
             } else {
-                return Main.SFTInfo + "Release1.5.1, Author all rights reserved";
+                return Main.SFTInfo + "Release1.6, all rights reserved";
             }
         } catch (Exception ex) {
-            return Main.SFTInfo + "Release1.5.1, Author all rights reserved";
+            return Main.SFTInfo + "Release1.6, all rights reserved";
         }
+    }
+
+    public static List<ItemStack> getItemData(Inventory inv) {
+        List<ItemStack> details = new ArrayList<>();
+        for (ItemStack is : inv.getContents()) {
+            if (null != is) {
+                if (!is.equals(APILibrary.getTargetItem(1)) &&
+                        !is.equals(APILibrary.getTargetItem(2)) &&
+                        !is.equals(APILibrary.getTargetItem(3))) {
+                    details.add(is);
+                }
+            }
+        }
+        return details;
+    }
+
+    public static ItemStack getTargetItem(int i) {
+        if (i == 1) {
+            ItemStack barrier = new ItemStack(Material.BARRIER);
+            ItemMeta meta = barrier.getItemMeta();
+            meta.setDisplayName(Main.prop.getProperty("tradeguibarrier"));
+            meta.addEnchant(Enchantment.DIG_SPEED, 10, true);
+            barrier.setItemMeta(meta);
+            return barrier;
+        }
+        if (i == 2) {
+            ItemStack emerald_block = new ItemStack(Material.EMERALD_BLOCK);
+            ItemMeta meta = emerald_block.getItemMeta();
+            meta.setDisplayName(Main.prop.getProperty("tradeguiemeraldblock"));
+            meta.addEnchant(Enchantment.DIG_SPEED, 10, true);
+            emerald_block.setItemMeta(meta);
+            return emerald_block;
+        }
+        if (i == 3) {
+            ItemStack iron_fence = new ItemStack(Material.IRON_FENCE);
+            ItemMeta meta = iron_fence.getItemMeta();
+            meta.setDisplayName(Main.prop.getProperty("tradeguiironfence"));
+            meta.addEnchant(Enchantment.DIG_SPEED, 10, true);
+            iron_fence.setItemMeta(meta);
+            return iron_fence;
+        }
+        return null;
+    }
+
+    public static Connection getConnection(String type, String url, String user, String pass) throws SQLException {
+        try {
+            if (type.equals("mysql")) {
+                Class.forName("com.mysql.cj.jdbc.Driver");
+                String nurl = url.replace("SFTFinance", "mysql");
+                Connection nconn = DriverManager.getConnection(nurl, user, pass);
+                Statement statement = nconn.createStatement();
+                statement.execute("create database sftfinance");
+                statement.execute("use sftfinance");
+                statement.execute("create table wallets (UUID varchar(255) primary key, PlayerID varchar(255), Seed varchar(255), Address varchar(255), PrivateKey varchar(255), PublicKey varchar(255))");
+                statement.close();
+                nconn.close();
+                return DriverManager.getConnection(url, user, pass);
+            } else if (type.equals("sqlite")) {
+                Class.forName("org.sqlite.JDBC");
+                Connection conn = DriverManager.getConnection(url);
+                Statement statement = conn.createStatement();
+                statement.executeUpdate("create table wallets (UUID string primary key, PlayerID string, Seed string, Address string, PrivateKey string, PublicKey string)");
+                statement.close();
+                return conn;
+            }
+        } catch (Exception ex) {
+            if (type.equals("mysql")) {
+                return DriverManager.getConnection(url, user, pass);
+            } else if (type.equals("sqlite")) {
+                return DriverManager.getConnection(url);
+            }
+        }
+        return null;
+    }
+
+    public static List<String> getTradeList(int type, String player, Connection connection) throws SQLException {
+        List<String> result = new ArrayList<>();
+        if (type == 1) {
+            PreparedStatement statement = connection.prepareStatement("select ID from transactions where fromid = ? and toid != ?;");
+            statement.setString(1, player);
+            statement.setString(2, "NONE");
+            ResultSet rs = statement.executeQuery();
+            while (rs.next()) {
+                result.add(rs.getString("ID"));
+            }
+            rs.close();
+            statement.close();
+            return result;
+        } else if (type == 2) {
+            PreparedStatement statement = connection.prepareStatement("select ID from transactions where toid = ?;");
+            statement.setString(1, player);
+            ResultSet rs = statement.executeQuery();
+            while (rs.next()) {
+                result.add(rs.getString("ID"));
+            }
+            rs.close();
+            statement.close();
+            return result;
+        } else if (type == 3) {
+            PreparedStatement statement = connection.prepareStatement("select ID from transactions where fromid = ? and toid = ?;");
+            statement.setString(1, player);
+            statement.setString(2, "NONE");
+            ResultSet rs = statement.executeQuery();
+            while (rs.next()) {
+                result.add(rs.getString("ID"));
+            }
+            rs.close();
+            statement.close();
+            return result;
+        }
+        return null;
+    }
+
+    public static List<String> getHelpData(String page, List<String> message) {
+        for (Entry<String, Map<Integer, String>> HELPMap : Main.HelpPageMap.entrySet()) {
+            HelpPageData HelpData = new HelpPageData(Main.HelpPageMap.get(HELPMap.getKey()));
+            if (HELPMap.getKey().equals("Page" + page)) {
+                message.add(HelpData.front);
+                message.add(HelpData.comment1);
+                message.add(HelpData.comment2);
+                message.add(HelpData.comment3);
+                message.add(HelpData.comment4);
+                message.add(HelpData.comment5);
+                message.add(HelpData.comment6);
+                message.add(HelpData.comment7);
+                message.add(HelpData.comment8);
+                message.add(HelpData.comment9);
+                message.add(HelpData.comment10);
+            }
+        }
+        return message;
     }
 
     public static Web3j getWeb3j(String HttpUrl) {
@@ -362,6 +643,54 @@ public class APILibrary {
         return false;
     }
 
+    public static boolean checkDealAcceptDenyPermission(CommandSender commandSender, String type, String playerid, int id, Connection conn) throws SQLException {
+        List<String> from = APILibrary.getTradeList(1, playerid, conn);
+        List<String> to = APILibrary.getTradeList(2, playerid, conn);
+        List<String> noneFrom = APILibrary.getTradeList(3, playerid, conn);
+        String strid = String.valueOf(id);
+        if (type.equals("all")) {
+            if (from.contains(strid) || to.contains(strid) || noneFrom.contains(strid)) {
+                return false;
+            }
+        } else if (type.equals("from")) {
+            if (from.contains(strid) || noneFrom.contains(strid)) {
+                return false;
+            }
+        } else if (type.equals("to")) {
+            if (to.contains(strid)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static boolean checkTradeAvailable(@NotNull CommandSender commandSender, PlayerWalletData commander) {
+        if (commandSender instanceof ConsoleCommandSender) {
+            commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("consoledeny"));
+            return true;
+        }
+        if (!Main.fileconfig.getBoolean("playerCanTradeEachOther")) {
+            commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("featureunable"));
+            return true;
+        }
+        if (!commander.has) {
+            commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("Notreg"));
+            return true;
+        }
+        if (Main.fileconfig.getBoolean("TradeWorldLimit")) {
+            List<String> world = Main.fileconfig.getStringList("LimitedWorld");
+            if (world.contains(Bukkit.getPlayer(commander.playerid).getWorld().getName())) {
+                commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("worlderror"));
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean checkSelf(@NotNull CommandSender commandSender, String parameters) {
+        return commandSender.getName().equals(parameters);
+    }
+
     public static String CheckTokenType(String Type) {
         for (Entry<String, Map<Integer, String>> ERC20Map : Main.ERC20ContractMap.entrySet()) {
             String TokenSymbol = Main.ERC20ContractMap.get(ERC20Map.getKey()).get(2);
@@ -396,7 +725,7 @@ public class APILibrary {
     }
 
     public static boolean executeCommand(ExchangeData exchangeData, CommandSender commandSender, String executecommand, String transactionHash) {
-        commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("TransferSuccess") + "\n\u00a7a" + Main.fileconfig.getString("ExplorerUrl") + transactionHash);
+        commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("TransferSuccess") + Main.fileconfig.getString("ExplorerUrl") + transactionHash);
         Bukkit.getScheduler().runTask(Main.getPlugin(Main.class), () -> {
             Player commandSenderPlayer = (Player) commandSender;
             boolean isOp = commandSenderPlayer.isOp();
@@ -419,7 +748,17 @@ public class APILibrary {
         return executeCommand(exchangeData, commandSender, executecommand, TransactionHash);
     }
 
-    public static String checkLegalExchange(String Type, PlayerWalletData commander, CommandSender commandSender) throws IOException {
+    public static boolean executeTrade(PlayerDealData pdd, PlayerWalletData playerWalletData, CommandSender commandSender) throws Exception {
+        ReceiptData rd = new ReceiptData(pdd.type, pdd.toid.fromaddress, pdd.fromid.fromaddress, pdd.value, "null", String.valueOf(Main.chainlibrary.web3j.ethGasPrice().send().getGasPrice().divide(new BigInteger("1000000000"))));
+        if (executeTransfer(playerWalletData, rd, commandSender)) {
+            if (advancedUpdateData(pdd, Main.conn)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static String checkLegalExchange(String Type, PlayerWalletData commander, CommandSender commandSender, String ToAddress) throws IOException {
         String DealType = CheckDealType(Type);
         for (Entry<String, Map<Integer, String>> DealMap : Main.ExchangeMap.entrySet()) {
             if (DealType.equals(DealMap.getKey())) {
@@ -428,7 +767,6 @@ public class APILibrary {
                 if (!TokenType.equals(exchangeData.tokentype)) {
                     return "errortokentype";
                 }
-                String ToAddress = Main.ConsoleWallet.fromaddress;
                 String value = exchangeData.price;
                 String executecommand = exchangeData.executecommand.replace("{player}", commander.playerid);
                 for (Entry<String, Map<Integer, String>> ERC20Map : Main.ERC20ContractMap.entrySet()) {
