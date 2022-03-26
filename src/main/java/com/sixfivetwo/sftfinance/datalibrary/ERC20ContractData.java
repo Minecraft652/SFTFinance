@@ -27,4 +27,8 @@ public class ERC20ContractData {
             error = true;
         }
     }
+
+    public ERC20ContractData() {
+
+    }
 }
