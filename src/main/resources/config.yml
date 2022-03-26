@@ -1,12 +1,19 @@
-Version: Release1.2 #Version. 版本号
+Version: Release1.6 #Version. 版本号
 Language: en_US.properties #LanguageFile,Support English and chinese,chinese is zh_CN.properties. 语言文件，支持英文和中文，中文填 zh_CN.properties
-HttpUrl: https://data-seed-prebsc-1-s1.binance.org:8545/ #blockchain httpurl. 区块链的HTTP和端口连接
+HttpUrl: https://data-seed-prebsc-1-s1.binance.org:8545/ #blockchain httpUrl. 区块链的HTTP和端口连接
 ExplorerUrl: §ahttps://testnet.bscscan.com/tx/ #Blockchain explorer url. 区块链浏览器的地址
 Symbol: BNB #NaiveToken Symbol. 原链代币的标志
 ChainName: "Binance Smart Chain Testnet" #chainname 链名
 ChainID: 97 #blockchain id 链id.
 OnPlayerLoginRegisterWallet: true #whether to create a wallet when the player logs in, true = yes. 是否在玩家登录时创建钱包，true为是
-playerCanImportTheyOwnWallet: false #Whether to enable players to enter their own wallets, true = yes. WARNING! This feature will happen in the future, don't enable this!是否允许玩家自行输入钱包. true为是 警告,这个功能暂时还没有实现,请不要开启
+LegacyWalletGenerator: false #Whether to enable legacy wallet generator, BIP39 Wallet. If you are in old minecraft version like 1.8. enable this true = yes. 是否使用老式生成方式生成钱包. true为是 如果你是老版本1.8出现了错误打开这个
+playerCanImportTheyOwnWallet: false #Whether to enable players to enter their own wallets, true = yes.是否允许玩家自行输入钱包. true为是
+playerCanTradeEachOther: false #whether to enable players to trade each others: /wallet trade, true = yes.是否允许玩家相互使用物品交易命令 /wallet trade ,true为是.
+TradeWorldLimit: false #whether to enable trade world limit. In list you cannot trade in that world. 是否开启交易世界限制如果开启，下列世界均无法使用交易功能.
+LimitedWorld:
+  - world
+  - world_nether
+  - world_the_end
 IsMysql: false #whether to use mysql database. 是否使用Mysql数据库.
 MysqlUrl: mysql://localhost:3306/SFTFinance #Mysql Url. Mysql 链接地址.
 MysqlUser: root #Mysql user. Mysql 用户
