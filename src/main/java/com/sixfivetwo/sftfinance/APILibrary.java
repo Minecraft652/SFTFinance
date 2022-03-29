@@ -270,8 +270,12 @@ public class APILibrary {
 
     public static void playerSendInteractiveMessage(CommandSender commandSender, List<TextComponent> messageList) {
         for (TextComponent message : messageList) {
-            Player player = (Player) commandSender;
-            player.spigot().sendMessage(message);
+            if (commandSender instanceof ConsoleCommandSender) {
+                commandSender.sendMessage(message.toPlainText());
+            } else {
+                Player player = (Player) commandSender;
+                player.spigot().sendMessage(message);
+            }
         }
     }
 
@@ -357,12 +361,12 @@ public class APILibrary {
     public static String getVersion() {
         try {
             if (Objects.requireNonNull(Main.fileconfig.getString("Language")).contains("zh")) {
-                return Main.SFTInfo + "§a Release1.6, 保留所有权利";
+                return Main.SFTInfo + "§a Release1.6.1, 保留所有权利";
             } else {
-                return Main.SFTInfo + "Release1.6, all rights reserved";
+                return Main.SFTInfo + "Release1.6.1, all rights reserved";
             }
         } catch (Exception ex) {
-            return Main.SFTInfo + "Release1.6, all rights reserved";
+            return Main.SFTInfo + "Release1.6.1, all rights reserved";
         }
     }
 

@@ -86,9 +86,16 @@ public class SFTCommand implements CommandExecutor {
                             }
                             if (args[0].equals("create")) {
                                 if (!commander.has) {
-                                    Player commandSenderPlayer = (Player) commandSender;
-                                    String UUID = commandSenderPlayer.getUniqueId().toString();
-                                    String PlayerID = commandSenderPlayer.getName();
+                                    String UUID = null;
+                                    String PlayerID = null;
+                                    if (commandSender instanceof ConsoleCommandSender) {
+                                        UUID = "00000000-0000-0000-0000-000000000000";
+                                        PlayerID = "CONSOLE";
+                                    } else {
+                                        Player commandSenderPlayer = (Player) commandSender;
+                                        UUID = commandSenderPlayer.getUniqueId().toString();
+                                        PlayerID = commandSenderPlayer.getName();
+                                    }
                                     if (Main.fileconfig.getBoolean("LegacyWalletGenerator")) {
                                         if (APILibrary.legacyCreateWallet(UUID, PlayerID, Main.legacyDirectory)) {
                                             commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("Createwalletsuccess"));
