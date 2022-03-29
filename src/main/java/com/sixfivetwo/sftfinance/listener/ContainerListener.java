@@ -22,6 +22,9 @@ public class ContainerListener implements Listener {
     public void onClick(InventoryClickEvent e) throws SQLException {
         Player player = (Player) e.getWhoClicked();
         InventoryView inv = player.getOpenInventory();
+        if (null == e.getClickedInventory().getHolder()) {
+            return;
+        }
         if (e.getAction().equals(InventoryAction.NOTHING)) {
             return;
         }
