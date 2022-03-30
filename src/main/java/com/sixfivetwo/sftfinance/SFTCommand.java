@@ -338,25 +338,6 @@ public class SFTCommand implements CommandExecutor {
                                 ReceiptData rd = new ReceiptData(args[1], "null", args[2], args[3], "null", String.valueOf(Main.chainlibrary.web3j.ethGasPrice().send().getGasPrice().divide(new BigInteger("1000000000"))));
                                 if (APILibrary.executeApprove(commander, rd, commandSender)) return;
                             }
-                            commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("Help"));
-                            return;
-                        case 5:
-                            if (!commander.has) {
-                                commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("Notreg"));
-                                return;
-                            }
-                            if (args[0].equals("transfer")) {
-                                ReceiptData rd = new ReceiptData(args[1], "null", args[2], args[3], "null", args[4]);
-                                if (APILibrary.executeTransfer(commander, rd, commandSender)) return;
-                            }
-                            if (args[0].equals("transferfrom")) {
-                                ReceiptData rd = new ReceiptData(args[1], args[2], args[3], args[4], "null", String.valueOf(Main.chainlibrary.web3j.ethGasPrice().send().getGasPrice().divide(new BigInteger("1000000000"))));
-                                if (APILibrary.executeTransferFrom(commander, rd, commandSender)) return;
-                            }
-                            if (args[0].equals("approve")) {
-                                ReceiptData rd = new ReceiptData(args[1], "null", args[2], args[3], "null", args[4]);
-                                if (APILibrary.executeApprove(commander, rd, commandSender)) return;
-                            }
                             if (args[0].equals("trade")) {
                                 if (APILibrary.checkTradeAvailable(commandSender, commander)) return;
                                 if (APILibrary.checkSelf(commandSender, args[1])) return;
@@ -385,6 +366,25 @@ public class SFTCommand implements CommandExecutor {
                                     Bukkit.getPlayer(commander.playerid).openInventory(APILibrary.createInventory(new InventoryHolderData(tokenType, commander, playerWalletData, value)));
                                 });
                                 return;
+                            }
+                            commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("Help"));
+                            return;
+                        case 5:
+                            if (!commander.has) {
+                                commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("Notreg"));
+                                return;
+                            }
+                            if (args[0].equals("transfer")) {
+                                ReceiptData rd = new ReceiptData(args[1], "null", args[2], args[3], "null", args[4]);
+                                if (APILibrary.executeTransfer(commander, rd, commandSender)) return;
+                            }
+                            if (args[0].equals("transferfrom")) {
+                                ReceiptData rd = new ReceiptData(args[1], args[2], args[3], args[4], "null", String.valueOf(Main.chainlibrary.web3j.ethGasPrice().send().getGasPrice().divide(new BigInteger("1000000000"))));
+                                if (APILibrary.executeTransferFrom(commander, rd, commandSender)) return;
+                            }
+                            if (args[0].equals("approve")) {
+                                ReceiptData rd = new ReceiptData(args[1], "null", args[2], args[3], "null", args[4]);
+                                if (APILibrary.executeApprove(commander, rd, commandSender)) return;
                             }
                             commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("Help"));
                             return;
