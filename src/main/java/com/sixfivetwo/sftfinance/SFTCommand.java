@@ -151,6 +151,8 @@ public class SFTCommand implements CommandExecutor {
                                 }
                                 return;
                             }
+                            commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("Help"));
+                            return;
                         case 2:
                             if (args[0].equals("help")) {
                                 APILibrary.playerSendMessage(commandSender, APILibrary.getHelpData(args[1], message));
@@ -238,6 +240,8 @@ public class SFTCommand implements CommandExecutor {
                                     return;
                                 }
                             }
+                            commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("Help"));
+                            return;
                         case 3:
                             if (args[0].equals("exchange")) {
                                 String DealType = args[1];
@@ -319,6 +323,8 @@ public class SFTCommand implements CommandExecutor {
                                     return;
                                 }
                             }
+                            commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("Help"));
+                            return;
                         case 4:
                             if (!commander.has) {
                                 commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("Notreg"));
@@ -332,6 +338,8 @@ public class SFTCommand implements CommandExecutor {
                                 ReceiptData rd = new ReceiptData(args[1], "null", args[2], args[3], "null", String.valueOf(Main.chainlibrary.web3j.ethGasPrice().send().getGasPrice().divide(new BigInteger("1000000000"))));
                                 if (APILibrary.executeApprove(commander, rd, commandSender)) return;
                             }
+                            commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("Help"));
+                            return;
                         case 5:
                             if (!commander.has) {
                                 commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("Notreg"));
@@ -378,6 +386,8 @@ public class SFTCommand implements CommandExecutor {
                                 });
                                 return;
                             }
+                            commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("Help"));
+                            return;
                         case 6:
                             if (!commander.has) {
                                 commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("Notreg"));
@@ -395,14 +405,17 @@ public class SFTCommand implements CommandExecutor {
                                 ReceiptData rd = new ReceiptData(args[1], "null", args[2], args[3], args[5], args[4]);
                                 if (APILibrary.executeApprove(commander, rd, commandSender)) return;
                             }
+                            commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("Help"));
+                            return;
                         case 7:
                             if (args[0].equals("transferfrom")) {
                                 ReceiptData rd = new ReceiptData(args[1], args[2], args[3], args[4], args[6], args[5]);
                                 if (APILibrary.executeTransferFrom(commander, rd, commandSender)) return;
                             }
+                            commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("Help"));
+                            return;
                     }
                 }
-                commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("Help"));
             } catch (Exception ex) {
                 commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("Help"));
             }

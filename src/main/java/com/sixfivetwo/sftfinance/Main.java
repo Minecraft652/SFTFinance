@@ -165,8 +165,10 @@ public class Main extends JavaPlugin {
                 Bukkit.getServer().getPluginManager().registerEvents(new SFTListener(), this);
             }
 
-            Bukkit.getServer().getPluginManager().registerEvents(new ContainerListener(), this);
-            Bukkit.getServer().getPluginManager().registerEvents(new InventoryCloseListener(), this);
+            if (fileconfig.getBoolean("playerCanTradeEachOther")) {
+                Bukkit.getServer().getPluginManager().registerEvents(new ContainerListener(), this);
+                Bukkit.getServer().getPluginManager().registerEvents(new InventoryCloseListener(), this);
+            }
 
             Objects.requireNonNull(Bukkit.getPluginCommand("wallet")).setExecutor(new SFTCommand());
 
