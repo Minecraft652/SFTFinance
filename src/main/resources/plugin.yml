@@ -1,6 +1,6 @@
 name: SFTFinance
 main: com.sixfivetwo.sftfinance.Main
-version: Release1.6.1
+version: Release1.6.3
 commands:
   wallet:
     aliases:
