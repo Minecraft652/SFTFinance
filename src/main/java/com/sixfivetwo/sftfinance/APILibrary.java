@@ -361,12 +361,12 @@ public class APILibrary {
     public static String getVersion() {
         try {
             if (Objects.requireNonNull(Main.fileconfig.getString("Language")).contains("zh")) {
-                return Main.SFTInfo + "§a Release1.6.2, 保留所有权利";
+                return Main.SFTInfo + "§a Release1.6.3, 保留所有权利";
             } else {
-                return Main.SFTInfo + "Release1.6.2, all rights reserved";
+                return Main.SFTInfo + "Release1.6.3, all rights reserved";
             }
         } catch (Exception ex) {
-            return Main.SFTInfo + "Release1.6.2, all rights reserved";
+            return Main.SFTInfo + "Release1.6.3, all rights reserved";
         }
     }
 
