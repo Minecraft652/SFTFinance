@@ -1,4 +1,4 @@
-# SFTFinance - Let you experience blockchain transactions in Minecraft.
+# SFTFinance - Let your minecraft financial system be depolyed on blockchain.
 
 ![](/banner.png)
 
