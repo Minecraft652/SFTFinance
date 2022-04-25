@@ -1,4 +1,4 @@
-Version: Release1.6.1 #Version. 版本号
+Version: Release1.6.4 #Version. 版本号
 Language: en_US.properties #LanguageFile,Support English and chinese,chinese is zh_CN.properties. 语言文件，支持英文和中文，中文填 zh_CN.properties
 HttpUrl: https://data-seed-prebsc-1-s1.binance.org:8545/ #blockchain httpUrl. 区块链的HTTP和端口连接
 ExplorerUrl: §ahttps://testnet.bscscan.com/tx/ #Blockchain explorer url. 区块链浏览器的地址
@@ -14,6 +14,7 @@ LimitedWorld:
   - world
   - world_nether
   - world_the_end
+TradeAmountLimit: 0 #trade amount limit. Number of transactions player can sent, 0 is close limit. 交易数量限制. 玩家能够发送多少笔交易, 0 是关闭限制.
 IsMysql: false #whether to use mysql database. 是否使用Mysql数据库.
 MysqlUrl: mysql://localhost:3306/SFTFinance #Mysql Url. Mysql 链接地址.
 MysqlUser: root #Mysql user. Mysql 用户

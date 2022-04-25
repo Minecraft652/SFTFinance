@@ -21,7 +21,7 @@ Page2:
   comment7: "§bSends tokens to target addresses for specified gas prices."
   comment8: "§d/wallet transfer <TokenType> <TargetAddress> <amount> <gasprice> <gaslimit>"
   comment9: "§bSends tokens to target addresses specifying gas prices and gas limits."
-  comment10: "§eUse §a/wallet help 3§eView next page."
+  comment10: "§eUse §a/wallet help 3 §eView next page."
 Page3:
   front: "§6------- §a[§6SFT§cFinance §dCommand Help§a] §6-------§r"
   comment1: "§b/wallet §dapprove <TokenType> <TargetAddress> <amount>"
@@ -33,7 +33,7 @@ Page3:
   comment7: "§b/wallet §dtransferfrom <TokenType> <FromAddress> <TargetAddress> <amount> §bSolidity-Transferfrom method"
   comment8: "§b/wallet §dtransferfrom <TokenType> <FromAddress> <TargetAddress> <amount> <gasprice> §bSolidity-Transferfrom method"
   comment9: "§b/wallet §dtransferfrom <TokenType> <FromAddress> <TargetAddress> <amount> <gasprice> <gaslimit> §bSolidity-Transferfrom method"
-  comment10: "§eUse §a/wallet help 4§eView next page."
+  comment10: "§eUse §a/wallet help 4 §eView next page."
 Page4:
   front: "§6------- §a[§6SFT§cFinance §dCommand Help§a] §6-------§r"
   comment1: "§b/wallet §dtrade <PlayerID> <TokenType> <amount>"
@@ -45,4 +45,4 @@ Page4:
   comment7: "§b/wallet §dtrade accept <TradeID> §bAccept this transaction ,only the receiver. and receiver will pay for this."
   comment8: "§b/wallet §dtrade deny <TradeID> §bDeny this transaction. next need sender to use /wallet trade edit <TradeID> take their items."
   comment9: "§b/wallet §dtrade info <TradeID> §bView this transaction info."
-  comment10: "§eUse §a/wallet help 1§eView first page."
+  comment10: "§eUse §a/wallet help 1 §eView first page."
