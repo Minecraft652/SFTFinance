@@ -248,17 +248,7 @@ public class SFTCommand implements CommandExecutor {
                                 if (!args[2].equals("info")) {
                                     return;
                                 }
-                                for (Entry<String, Map<Integer, String>> DealMap : Main.ExchangeMap.entrySet()) {
-                                    ExchangeData exchangeData = new ExchangeData(Main.ExchangeMap.get(DealMap.getKey()));
-                                    if (DealType.equals(DealMap.getKey())) {
-                                        message.add(Main.SFTInfo + Main.prop.getProperty("exchangetokentype") + exchangeData.tokentype);
-                                        message.add(Main.SFTInfo + Main.prop.getProperty("exchangeprice") + exchangeData.price);
-                                        message.add(Main.SFTInfo + Main.prop.getProperty("exchangeexecutecommand") + exchangeData.executecommand);
-                                        APILibrary.playerSendMessage(commandSender, message);
-                                        return;
-                                    }
-                                }
-                                commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("Help"));
+                                APILibrary.playerSendMessage(commandSender, APILibrary.getViewExchangeData(DealType, message));
                                 return;
                             }
                             if (args[0].equals("trade")) {

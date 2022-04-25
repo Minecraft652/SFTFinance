@@ -109,6 +109,7 @@ public class Main extends JavaPlugin {
                 FileMapExchange.put(1, fileexchange.getString(exchangeroot + ".Tokentype"));
                 FileMapExchange.put(2, fileexchange.getString(exchangeroot + ".Price"));
                 FileMapExchange.put(3, fileexchange.getString(exchangeroot + ".Executecommand"));
+                FileMapExchange.put(4, fileexchange.getString(exchangeroot + ".ExecutorIsConsole"));
                 ExchangeMap.put(exchangeroot, FileMapExchange);
             }
 

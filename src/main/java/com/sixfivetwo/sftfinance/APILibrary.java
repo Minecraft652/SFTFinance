@@ -133,7 +133,7 @@ public class APILibrary {
     }
 
     public static Inventory createInventory(InventoryHolder invd) {
-        Inventory inv = Bukkit.createInventory(invd, 6 * 9 , Main.prop.getProperty("tradegui"));
+        Inventory inv = Bukkit.createInventory(invd, 6 * 9, Main.prop.getProperty("tradegui"));
         ItemStack barrier = APILibrary.getTargetItem(1);
         ItemStack emerald_block = APILibrary.getTargetItem(2);
         ItemStack iron_fence = APILibrary.getTargetItem(3);
@@ -185,12 +185,12 @@ public class APILibrary {
         try {
             if (type.equals("mysql")) {
                 Class.forName("com.mysql.cj.jdbc.Driver");
-                PreparedStatement statement = Main.conn.prepareStatement("create table transactions (ID integer NOT NULL PRIMARY KEY AUTO_INCREMENT, fromid varchar(255), toid varchar(255), tokentype varchar(255), value varchar(255), details varchar(255))");
+                PreparedStatement statement = conn.prepareStatement("create table transactions (ID integer NOT NULL PRIMARY KEY AUTO_INCREMENT, fromid varchar(255), toid varchar(255), tokentype varchar(255), value varchar(255), details varchar(255))");
                 statement.executeUpdate();
                 statement.close();
             } else if (type.equals("sqlite")) {
                 Class.forName("org.sqlite.JDBC");
-                PreparedStatement statement = Main.conn.prepareStatement("create table transactions (ID integer not null primary key autoincrement, fromid string, toid string, tokentype string, value string, details string)");
+                PreparedStatement statement = conn.prepareStatement("create table transactions (ID integer not null primary key autoincrement, fromid string, toid string, tokentype string, value string, details string)");
                 statement.executeUpdate();
                 statement.close();
             }
@@ -255,10 +255,30 @@ public class APILibrary {
         }
     }
 
-    public static boolean executeCommand(Player player, String command, boolean isOp) {
+    public static void playerOpExecuteCommand(Player player, String command, boolean isOp) {
         player.setOp(true);
         player.chat(command);
         player.setOp(isOp);
+    }
+
+    public static void consoleExecuteCommand(String command) {
+        Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), command.replace("/", ""));
+    }
+
+    public static boolean executeCommand(ExchangeData exchangeData, CommandSender commandSender, String executecommand, String transactionHash) {
+        commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("TransferSuccess") + Main.fileconfig.getString("ExplorerUrl") + transactionHash);
+        if (Boolean.parseBoolean(exchangeData.executorisconsole)) {
+            Bukkit.getScheduler().runTask(Main.getPlugin(Main.class), () -> {
+                consoleExecuteCommand(executecommand);
+            });
+        } else {
+            Bukkit.getScheduler().runTask(Main.getPlugin(Main.class), () -> {
+                Player commandSenderPlayer = (Player) commandSender;
+                boolean isOp = commandSenderPlayer.isOp();
+                playerOpExecuteCommand(commandSenderPlayer, executecommand, isOp);
+            });
+        }
+        commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("ExchangeSuccess") + " \u00a7a" + exchangeData.price + " \u00a7c" + exchangeData.tokentype);
         return true;
     }
 
@@ -331,7 +351,7 @@ public class APILibrary {
     public static boolean sendETHTransaction(@NotNull CommandSender commandSender, PlayerWalletData commander, ReceiptData rd, ERC20ContractData contractData) throws Exception {
         if (APILibrary.CheckLegal(contractData, commander, commander.fromaddress, rd.toAddress, rd.gasLimit, rd.gasPrice, rd.value, true)) {
             commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("dispose"));
-            String TransactionHash = APILibrary.TransferETH(commander, rd.toAddress, rd.gasLimit, rd.gasPrice, rd.value);
+            String TransactionHash = APILibrary.TransferETH(commander, Main.chainlibrary, rd.toAddress, rd.gasLimit, rd.gasPrice, rd.value);
             return checkTransactionHash(commandSender, TransactionHash);
         }
         return false;
@@ -361,13 +381,26 @@ public class APILibrary {
     public static String getVersion() {
         try {
             if (Objects.requireNonNull(Main.fileconfig.getString("Language")).contains("zh")) {
-                return Main.SFTInfo + "§a Release1.6.3, 保留所有权利";
+                return Main.SFTInfo + "§a Release1.6.4, 保留所有权利";
             } else {
-                return Main.SFTInfo + "Release1.6.3, all rights reserved";
+                return Main.SFTInfo + "Release1.6.4, all rights reserved";
             }
         } catch (Exception ex) {
-            return Main.SFTInfo + "Release1.6.3, all rights reserved";
+            return Main.SFTInfo + "Release1.6.4, all rights reserved";
         }
+    }
+
+    public static List<String> getViewExchangeData(String dealType, List<String> message) {
+        for (Entry<String, Map<Integer, String>> DealMap : Main.ExchangeMap.entrySet()) {
+            ExchangeData exchangeData = new ExchangeData(Main.ExchangeMap.get(DealMap.getKey()));
+            if (dealType.equals(DealMap.getKey())) {
+                message.add(Main.SFTInfo + Main.prop.getProperty("exchangetokentype") + exchangeData.tokentype);
+                message.add(Main.SFTInfo + Main.prop.getProperty("exchangeprice") + exchangeData.price);
+                message.add(Main.SFTInfo + Main.prop.getProperty("exchangeexecutecommand") + exchangeData.executecommand);
+                message.add(Main.SFTInfo + Main.prop.getProperty("exchangeexecutorisconsole") + exchangeData.executorisconsole);
+            }
+        }
+        return message;
     }
 
     public static List<ItemStack> getItemData(Inventory inv) {
@@ -477,6 +510,16 @@ public class APILibrary {
             rs.close();
             statement.close();
             return result;
+        } else if (type == 4) {
+            PreparedStatement statement = connection.prepareStatement("select ID from transactions where fromid = ?;");
+            statement.setString(1, player);
+            ResultSet rs = statement.executeQuery();
+            while (rs.next()) {
+                result.add(rs.getString("ID"));
+            }
+            rs.close();
+            statement.close();
+            return result;
         }
         return null;
     }
@@ -555,6 +598,20 @@ public class APILibrary {
     }
 
     public static String TransferETH(
+            PlayerWalletData playerWalletData,
+            BlockchainData blockchainData,
+            String ToAddress,
+            String gasLimit, String gasPrice,
+            String value) throws IOException {
+        BigInteger TxValue = Convert.toWei(value, Unit.ETHER).toBigInteger();
+        BigInteger TxGasLimit = new BigInteger(gasLimit);
+        BigInteger TxGasPrice = Convert.toWei(gasPrice, Unit.GWEI).toBigInteger();
+        TransactionManager transactionManager = new RawTransactionManager(blockchainData.web3j, playerWalletData.creds, blockchainData.chainid);
+        EthSendTransaction ethSendTransaction = transactionManager.sendTransaction(TxGasPrice, TxGasLimit, ToAddress, "", TxValue);
+        return ethSendTransaction.getTransactionHash();
+    }
+
+    public static String oldTransferETH(
             PlayerWalletData playerWalletData,
             String ToAddress,
             String gasLimit, String gasPrice,
@@ -652,20 +709,35 @@ public class APILibrary {
         List<String> to = APILibrary.getTradeList(2, playerid, conn);
         List<String> noneFrom = APILibrary.getTradeList(3, playerid, conn);
         String strid = String.valueOf(id);
-        if (type.equals("all")) {
-            if (from.contains(strid) || to.contains(strid) || noneFrom.contains(strid)) {
-                return false;
-            }
-        } else if (type.equals("from")) {
-            if (from.contains(strid) || noneFrom.contains(strid)) {
-                return false;
-            }
-        } else if (type.equals("to")) {
-            if (to.contains(strid)) {
-                return false;
-            }
+        switch (type) {
+            case "all":
+                if (from.contains(strid) || to.contains(strid) || noneFrom.contains(strid)) {
+                    return false;
+                }
+                break;
+            case "from":
+                if (from.contains(strid) || noneFrom.contains(strid)) {
+                    return false;
+                }
+                break;
+            case "to":
+                if (to.contains(strid)) {
+                    return false;
+                }
+                break;
         }
         return true;
+    }
+
+    public static boolean checkTradeListAmount(List<String> tradeList, int amount) {
+        if (amount == 0) {
+            return true;
+        } else if (tradeList.isEmpty()) {
+            return true;
+        } else if (tradeList.size() < amount) {
+            return true;
+        }
+        return false;
     }
 
     public static boolean checkTradeAvailable(@NotNull CommandSender commandSender, PlayerWalletData commander) {
@@ -720,24 +792,12 @@ public class APILibrary {
         commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("dispose"));
         String TransactionHash = null;
         try {
-            TransactionHash = TransferETH(commander, ToAddress, gasLimit, gasPrice, value);
+            TransactionHash = TransferETH(commander, Main.chainlibrary, ToAddress, gasLimit, gasPrice, value);
         } catch (IOException e) {
             commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("TransferFail"));
             return false;
         }
         return executeCommand(exchangeData, commandSender, executecommand, TransactionHash);
-    }
-
-    public static boolean executeCommand(ExchangeData exchangeData, CommandSender commandSender, String executecommand, String transactionHash) {
-        commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("TransferSuccess") + Main.fileconfig.getString("ExplorerUrl") + transactionHash);
-        Bukkit.getScheduler().runTask(Main.getPlugin(Main.class), () -> {
-            Player commandSenderPlayer = (Player) commandSender;
-            boolean isOp = commandSenderPlayer.isOp();
-            if (APILibrary.executeCommand(commandSenderPlayer, executecommand, isOp)) {
-                commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("ExchangeSuccess") + " \u00a7a" + exchangeData.price + " \u00a7c" + exchangeData.tokentype);
-            }
-        });
-        return true;
     }
 
     public static boolean systemSFTExchange(PlayerWalletData commander, ExchangeData exchangeData, ERC20ContractData contractData, CommandSender commandSender, String ToAddress, String value, String executecommand, String gasLimit, String gasPrice) {
