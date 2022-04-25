@@ -194,6 +194,7 @@ public class Main extends JavaPlugin {
                     "".equals(fileconfig.getString("playerCanTradeEachOther")) ||
                     "".equals(fileconfig.getString("TradeWorldLimit")) ||
                     "".equals(fileconfig.getString("LimitedWorld")) ||
+                    "".equals(fileconfig.getString("TradeAmountLimit")) ||
                     "".equals(fileconfig.getString("IsMysql")) ||
                     "".equals(fileconfig.getString("MysqlUrl")) ||
                     "".equals(fileconfig.getString("MysqlUser")) ||
@@ -211,6 +212,7 @@ public class Main extends JavaPlugin {
                     null == fileconfig.getString("playerCanTradeEachOther") ||
                     null == fileconfig.getString("TradeWorldLimit") ||
                     null == fileconfig.getString("LimitedWorld") ||
+                    null == fileconfig.getString("TradeAmountLimit") ||
                     null == fileconfig.getString("IsMysql") ||
                     null == fileconfig.getString("MysqlUrl") ||
                     null == fileconfig.getString("MysqlUser") ||
