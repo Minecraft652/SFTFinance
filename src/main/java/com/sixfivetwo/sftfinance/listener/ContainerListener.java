@@ -40,7 +40,16 @@ public class ContainerListener implements Listener {
                 ItemStack emerald_block = APILibrary.getTargetItem(2);
                 if (is.equals(emerald_block)) {
                     e.setCancelled(true);
+                    if (!APILibrary.checkTradeListAmount(APILibrary.getTradeList(4, player.getName(), Main.conn), Main.fileconfig.getInt("TradeAmountLimit"))) {
+                        player.sendMessage(Main.SFTInfo + Main.prop.getProperty("nofitymaxlimit"));
+                        inv.close();
+                        return;
+                    }
                     List<ItemStack> details = APILibrary.getItemData(inv.getTopInventory());
+                    if (details.isEmpty()) {
+                        inv.close();
+                        return;
+                    }
                     InventoryHolderData invd = (InventoryHolderData) inv.getTopInventory().getHolder();
                     PlayerDealData pdd = new PlayerDealData(invd.type, invd.value, invd.fromid, invd.toid, details);
                     pdd.insertData(Main.conn);
