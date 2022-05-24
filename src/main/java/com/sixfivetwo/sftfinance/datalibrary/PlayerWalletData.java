@@ -34,7 +34,58 @@ public class PlayerWalletData {
             }
             has = true;
         } catch (Exception ex) {
+            if (Main.fileconfig.getBoolean("EnableErrorPrint")) {
+                ex.printStackTrace();
+            }
             has = false;
         }
+    }
+
+    public boolean isHas() {
+        return has;
+    }
+
+    public Credentials getCreds() {
+        return creds;
+    }
+
+    public String getFromaddress() {
+        return fromaddress;
+    }
+
+    public String getPlayerid() {
+        return playerid;
+    }
+
+    public String getPrivatekey() {
+        return privatekey;
+    }
+
+    public String getSeed() {
+        return seed;
+    }
+
+    public void setCreds(Credentials creds) {
+        this.creds = creds;
+    }
+
+    public void setFromaddress(String fromaddress) {
+        this.fromaddress = fromaddress;
+    }
+
+    public void setHas(boolean has) {
+        this.has = has;
+    }
+
+    public void setPlayerid(String playerid) {
+        this.playerid = playerid;
+    }
+
+    public void setPrivatekey(String privatekey) {
+        this.privatekey = privatekey;
+    }
+
+    public void setSeed(String seed) {
+        this.seed = seed;
     }
 }

@@ -2,7 +2,7 @@ SimpleExchange: #DealName 交易对名称
   Tokentype : BNB #DealTokentype 交易对代币类型
   Price: 0.0001 #DealPrice 交易对价格
   Executecommand: /give {player} diamond_sword 1 #if deal is success,then execute. 如果交易成功则执行以下命令
-  ExecutorIsConsole: false
+  ExecutorIsConsole: false #whether CONSOLE is command executor. 是否由 CONSOLE 来执行命令.
 ExchangeSimple:
   Tokentype : SFT
   Price: 20

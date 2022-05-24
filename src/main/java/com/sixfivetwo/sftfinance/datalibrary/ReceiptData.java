@@ -17,6 +17,30 @@ public class ReceiptData {
         this.gasPrice = gasPrice;
     }
 
+    public String getType() {
+        return type;
+    }
+
+    public String getFromAddress() {
+        return fromAddress;
+    }
+
+    public String getToAddress() {
+        return toAddress;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public String getGasLimit() {
+        return gasLimit;
+    }
+
+    public String getGasPrice() {
+        return gasPrice;
+    }
+
     public void setType(String type) {
         this.type = type;
     }

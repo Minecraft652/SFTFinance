@@ -151,6 +151,16 @@ public class SFTCommand implements CommandExecutor {
                                 }
                                 return;
                             }
+                            if (args[0].equals("reload")) {
+                                if (commandSender.isOp()) {
+                                    Main main = (Main) Bukkit.getServer().getPluginManager().getPlugin("SFTFinance");
+                                    main.reloadWithCommand(commandSender);
+                                    return;
+                                } else {
+                                    commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("permissiondeny"));
+                                    return;
+                                }
+                            }
                             commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("Help"));
                             return;
                         case 2:
@@ -407,6 +417,9 @@ public class SFTCommand implements CommandExecutor {
                     }
                 }
             } catch (Exception ex) {
+                if (Main.fileconfig.getBoolean("EnableErrorPrint")) {
+                    ex.printStackTrace();
+                }
                 commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("Help"));
             }
         });

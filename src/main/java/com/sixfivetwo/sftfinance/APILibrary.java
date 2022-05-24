@@ -45,7 +45,7 @@ import java.util.*;
 import java.util.Map.Entry;
 
 public class APILibrary {
-    final static ImmutableList<ChildNumber> BIP44_ETH_ACCOUNT_ZERO_PATH =
+    public static ImmutableList<ChildNumber> BIP44_ETH_ACCOUNT_ZERO_PATH =
             ImmutableList.of(new ChildNumber(44, true), new ChildNumber(60, true),
                     ChildNumber.ZERO_HARDENED, ChildNumber.ZERO);
 
@@ -70,8 +70,8 @@ public class APILibrary {
         return textComponent;
     }
 
-    public static void loadHelpFile(File helpfile, FileConfiguration filehelp, Map<String, Map<Integer, String>> HelpPageMap) {
-        filehelp = YamlConfiguration.loadConfiguration(helpfile);
+    public static void loadHelpFile(File helpfile, Map<String, Map<Integer, String>> HelpPageMap) {
+        FileConfiguration filehelp = YamlConfiguration.loadConfiguration(helpfile);
         for (String helproot : filehelp.getKeys(false)) {
             Map<Integer, String> FileMapHelp = new HashMap<>();
             FileMapHelp.put(1, filehelp.getString(helproot + ".front"));
@@ -381,12 +381,12 @@ public class APILibrary {
     public static String getVersion() {
         try {
             if (Objects.requireNonNull(Main.fileconfig.getString("Language")).contains("zh")) {
-                return Main.SFTInfo + "§a Release1.6.4, 保留所有权利";
+                return Main.SFTInfo + "§a Beta1.6.5.0, 保留所有权利";
             } else {
-                return Main.SFTInfo + "Release1.6.4, all rights reserved";
+                return Main.SFTInfo + "Beta1.6.5.0, all rights reserved";
             }
         } catch (Exception ex) {
-            return Main.SFTInfo + "Release1.6.4, all rights reserved";
+            return Main.SFTInfo + "Beta1.6.5.0, all rights reserved";
         }
     }
 
@@ -656,12 +656,12 @@ public class APILibrary {
             PlayerWalletData commander,
             ReceiptData rd, CommandSender commandSender) throws Exception {
         String TokenType = APILibrary.CheckTokenType(rd.type);
-        for (Entry<String, Map<Integer, String>> ERC20Map : Main.ERC20ContractMap.entrySet()) {
-            ERC20ContractData contractData = new ERC20ContractData(Main.ERC20ContractMap.get(ERC20Map.getKey()), Main.chainlibrary);
-            if (TokenType.equals(Main.chainlibrary.symbol)) {
-                rd.setGasLimit("21000");
-                if (APILibrary.sendETHTransaction(commandSender, commander, rd, contractData)) return true;
-            } else {
+        if (TokenType.equals(Main.chainlibrary.symbol)) {
+            rd.setGasLimit("21000");
+            if (APILibrary.sendETHTransaction(commandSender, commander, rd, null)) return true;
+        } else {
+            for (Entry<String, Map<Integer, String>> ERC20Map : Main.ERC20ContractMap.entrySet()) {
+                ERC20ContractData contractData = new ERC20ContractData(Main.ERC20ContractMap.get(ERC20Map.getKey()), Main.chainlibrary);
                 if (TokenType.equals(contractData.symbol)) {
                     rd.setGasLimit(contractData.gaslimit);
                     if (APILibrary.sendSFTTransaction(commandSender, commander, rd, contractData)) return true;
@@ -768,11 +768,12 @@ public class APILibrary {
     }
 
     public static String CheckTokenType(String Type) {
+        if (Type.equals(Main.chainlibrary.symbol)) {
+            return Main.chainlibrary.symbol;
+        }
         for (Entry<String, Map<Integer, String>> ERC20Map : Main.ERC20ContractMap.entrySet()) {
             String TokenSymbol = Main.ERC20ContractMap.get(ERC20Map.getKey()).get(2);
-            if (Type.equals(Main.chainlibrary.symbol)) {
-                return Main.chainlibrary.symbol;
-            } else if (Type.equals(TokenSymbol)) {
+            if (Type.equals(TokenSymbol)) {
                 return TokenSymbol;
             }
         }
@@ -833,30 +834,29 @@ public class APILibrary {
                 }
                 String value = exchangeData.price;
                 String executecommand = exchangeData.executecommand.replace("{player}", commander.playerid);
+                if (TokenType.equals(Main.chainlibrary.symbol)) {
+                    String gasLimit = "21000";
+                    String gasPrice = String.valueOf(Main.chainlibrary.web3j.ethGasPrice().send().getGasPrice().divide(new BigInteger("1000000000")));
+                    if (!CheckLegal(null, commander, commander.fromaddress, ToAddress, gasLimit, gasPrice, value, true)) {
+                        return "unlegalparameters";
+                    }
+                    if (systemETHExchange(commander, exchangeData, commandSender, ToAddress, value, executecommand, gasLimit, gasPrice)) {
+                        return "success";
+                    }
+                    return "CheckGas";
+                }
                 for (Entry<String, Map<Integer, String>> ERC20Map : Main.ERC20ContractMap.entrySet()) {
                     ERC20ContractData contractData = new ERC20ContractData(Main.ERC20ContractMap.get(ERC20Map.getKey()), Main.chainlibrary);
-                    if (TokenType.equals(Main.chainlibrary.symbol)) {
-                        String gasLimit = "21000";
-                        String gasPrice = String.valueOf(Main.chainlibrary.web3j.ethGasPrice().send().getGasPrice().divide(new BigInteger("1000000000")));
-                        if (!CheckLegal(contractData, commander, commander.fromaddress, ToAddress, gasLimit, gasPrice, value, true)) {
+                    String gasLimit = contractData.gaslimit;
+                    String gasPrice = String.valueOf(Main.chainlibrary.web3j.ethGasPrice().send().getGasPrice().divide(new BigInteger("1000000000")));
+                    if (TokenType.equals(contractData.symbol)) {
+                        if (!CheckLegal(contractData, commander, commander.fromaddress, ToAddress, gasLimit, gasPrice, value, false)) {
                             return "unlegalparameters";
                         }
-                        if (systemETHExchange(commander, exchangeData, commandSender, ToAddress, value, executecommand, gasLimit, gasPrice)) {
+                        if (systemSFTExchange(commander, exchangeData, contractData, commandSender, ToAddress, value, executecommand, gasLimit, gasPrice)) {
                             return "success";
                         }
-                        return "CheckGas";
-                    } else {
-                        String gasLimit = contractData.gaslimit;
-                        String gasPrice = String.valueOf(Main.chainlibrary.web3j.ethGasPrice().send().getGasPrice().divide(new BigInteger("1000000000")));
-                        if (TokenType.equals(contractData.symbol)) {
-                            if (!CheckLegal(contractData, commander, commander.fromaddress, ToAddress, gasLimit, gasPrice, value, false)) {
-                                return "unlegalparameters";
-                            }
-                            if (systemSFTExchange(commander, exchangeData, contractData, commandSender, ToAddress, value, executecommand, gasLimit, gasPrice)) {
-                                return "success";
-                            }
-                            return "unknowerror";
-                        }
+                        return "unknowerror";
                     }
                 }
             }
@@ -905,5 +905,13 @@ public class APILibrary {
                 return false;
             }
         }
+    }
+
+    public static ImmutableList<ChildNumber> getBip44EthAccountZeroPath() {
+        return BIP44_ETH_ACCOUNT_ZERO_PATH;
+    }
+
+    public static void setBip44EthAccountZeroPath(ImmutableList<ChildNumber> ACCOUNT_ZERO_PATH) {
+        BIP44_ETH_ACCOUNT_ZERO_PATH = ACCOUNT_ZERO_PATH;
     }
 }

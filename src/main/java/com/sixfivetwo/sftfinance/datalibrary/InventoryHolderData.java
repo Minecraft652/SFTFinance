@@ -25,10 +25,6 @@ public class InventoryHolderData implements InventoryHolder {
         return null;
     }
 
-    public void setHas(boolean has) {
-        this.has = has;
-    }
-
     public void nofity(List<String> fromMessage, List<String> toMessage) {
         try {
             for (String message : fromMessage) {
@@ -38,5 +34,45 @@ public class InventoryHolderData implements InventoryHolder {
                 Bukkit.getPlayer(toid.playerid).sendMessage(message);
             }
         } catch (Exception ignored) {}
+    }
+
+    public boolean isHas() {
+        return has;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public PlayerWalletData getFromid() {
+        return fromid;
+    }
+
+    public PlayerWalletData getToid() {
+        return toid;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public void setHas(boolean has) {
+        this.has = has;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public void setFromid(PlayerWalletData fromid) {
+        this.fromid = fromid;
+    }
+
+    public void setToid(PlayerWalletData toid) {
+        this.toid = toid;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
     }
 }

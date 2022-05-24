@@ -4,7 +4,9 @@ import com.sixfivetwo.sftfinance.datalibrary.*;
 import com.sixfivetwo.sftfinance.listener.ContainerListener;
 import com.sixfivetwo.sftfinance.listener.InventoryCloseListener;
 import com.sixfivetwo.sftfinance.listener.SFTListener;
+import org.apache.logging.log4j.LogManager;
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -34,6 +36,13 @@ public class Main extends JavaPlugin {
     public static Map<String, Map<Integer, String>> ExchangeMap;
     public static Map<String, Map<Integer, String>> HelpPageMap;
     public static PlayerWalletData ConsoleWallet;
+    public static CommandFilter commandFilter;
+    public static SFTCommand sftCommand;
+    public static SFTListener sftListener;
+    public static ContainerListener containerListener;
+    public static InventoryCloseListener inventoryCloseListener;
+    public boolean isReload;
+    public CommandSender theReloader;
 
     public void onEnable() {
 
@@ -114,11 +123,11 @@ public class Main extends JavaPlugin {
             }
 
             if (Objects.requireNonNull(fileconfig.getString("Language")).contains("zh")) {
-                APILibrary.loadHelpFile(zhhelpfile, filehelp, HelpPageMap);
+                APILibrary.loadHelpFile(zhhelpfile, HelpPageMap);
             } else if (Objects.requireNonNull(fileconfig.getString("Language")).contains("ru")) {
-                APILibrary.loadHelpFile(ruhelpfile, filehelp, HelpPageMap);
+                APILibrary.loadHelpFile(ruhelpfile, HelpPageMap);
             } else {
-                APILibrary.loadHelpFile(enhelpfile, filehelp, HelpPageMap);
+                APILibrary.loadHelpFile(enhelpfile, HelpPageMap);
             }
 
             prop = new Properties();
@@ -159,19 +168,23 @@ public class Main extends JavaPlugin {
                 System.out.println(Main.prop.getProperty("error"));
             }
 
-            chainlibrary = new BlockchainData(fileconfig.getString("ChainName"), fileconfig.getString("HttpUrl"), fileconfig.getLong("ChainID"), fileconfig.getString("Symbol"));
+            chainlibrary = new BlockchainData(fileconfig.getString("ChainName"), fileconfig.getString("HttpUrl"), fileconfig.getLong("ChainID"), fileconfig.getString("Symbol"), APILibrary.getWeb3j(fileconfig.getString("HttpUrl")));
             ConsoleWallet = new PlayerWalletData("CONSOLE");
 
             if (fileconfig.getBoolean("OnPlayerLoginRegisterWallet")) {
-                Bukkit.getServer().getPluginManager().registerEvents(new SFTListener(), this);
+                sftListener = new SFTListener();
+                Bukkit.getServer().getPluginManager().registerEvents(sftListener, this);
             }
 
             if (fileconfig.getBoolean("playerCanTradeEachOther")) {
-                Bukkit.getServer().getPluginManager().registerEvents(new ContainerListener(), this);
-                Bukkit.getServer().getPluginManager().registerEvents(new InventoryCloseListener(), this);
+                containerListener = new ContainerListener();
+                inventoryCloseListener = new InventoryCloseListener();
+                Bukkit.getServer().getPluginManager().registerEvents(containerListener, this);
+                Bukkit.getServer().getPluginManager().registerEvents(inventoryCloseListener, this);
             }
 
-            Objects.requireNonNull(Bukkit.getPluginCommand("wallet")).setExecutor(new SFTCommand());
+            sftCommand = new SFTCommand();
+            Objects.requireNonNull(Bukkit.getPluginCommand("wallet")).setExecutor(sftCommand);
 
             if (Objects.requireNonNull(fileconfig.getString("Language")).contains("zh")) {
                 System.out.println(ThanksZh);
@@ -195,6 +208,8 @@ public class Main extends JavaPlugin {
                     "".equals(fileconfig.getString("TradeWorldLimit")) ||
                     "".equals(fileconfig.getString("LimitedWorld")) ||
                     "".equals(fileconfig.getString("TradeAmountLimit")) ||
+                    "".equals(fileconfig.getString("EnableCommandFilter")) ||
+                    "".equals(fileconfig.getString("EnableErrorPrint")) ||
                     "".equals(fileconfig.getString("IsMysql")) ||
                     "".equals(fileconfig.getString("MysqlUrl")) ||
                     "".equals(fileconfig.getString("MysqlUser")) ||
@@ -213,6 +228,8 @@ public class Main extends JavaPlugin {
                     null == fileconfig.getString("TradeWorldLimit") ||
                     null == fileconfig.getString("LimitedWorld") ||
                     null == fileconfig.getString("TradeAmountLimit") ||
+                    null == fileconfig.getString("EnableCommandFilter") ||
+                    null == fileconfig.getString("EnableErrorPrint") ||
                     null == fileconfig.getString("IsMysql") ||
                     null == fileconfig.getString("MysqlUrl") ||
                     null == fileconfig.getString("MysqlUser") ||
@@ -234,6 +251,21 @@ public class Main extends JavaPlugin {
                 }
             }
 
+            if (fileconfig.getBoolean("EnableCommandFilter")) {
+                Class.forName("org.apache.logging.log4j.core.filter.AbstractFilter");
+                org.apache.logging.log4j.core.Logger logger;
+                logger = (org.apache.logging.log4j.core.Logger) LogManager.getRootLogger();
+                commandFilter = new CommandFilter();
+                logger.addFilter(commandFilter);
+            }
+
+            if (isReload) {
+                System.out.println(Main.SFTInfo + prop.getProperty("reload"));
+                theReloader.sendMessage(Main.SFTInfo + prop.getProperty("reload"));
+                isReload = false;
+                theReloader = null;
+            }
+
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -246,5 +278,167 @@ public class Main extends JavaPlugin {
             System.out.println(Thanks);
         }
         System.out.println(APILibrary.getVersion());
+
+        conn = null;
+        prop = null;
+        chainlibrary = null;
+        fileconfig = null;
+        filecontract = null;
+        filehelp = null;
+        fileexchange = null;
+        legacyDirectory = null;
+        ERC20ContractMap = null;
+        ExchangeMap = null;
+        HelpPageMap = null;
+        ConsoleWallet = null;
+        commandFilter = null;
+        containerListener = null;
+        inventoryCloseListener = null;
+        sftListener = null;
+        sftCommand = null;
+        APILibrary.setBip44EthAccountZeroPath(null);
+    }
+
+    public void reloadWithCommand(CommandSender commandSender) {
+        isReload = true;
+        theReloader = commandSender;
+        onDisable();
+        onEnable();
+    }
+
+    public static BlockchainData getChainlibrary() {
+        return chainlibrary;
+    }
+
+    public static Connection getConn() {
+        return conn;
+    }
+
+    public static File getLegacyDirectory() {
+        return legacyDirectory;
+    }
+
+    public static FileConfiguration getFileconfig() {
+        return fileconfig;
+    }
+
+    public static FileConfiguration getFilecontract() {
+        return filecontract;
+    }
+
+    public static FileConfiguration getFileexchange() {
+        return fileexchange;
+    }
+
+    public static FileConfiguration getFilehelp() {
+        return filehelp;
+    }
+
+    public static Map<String, Map<Integer, String>> getERC20ContractMap() {
+        return ERC20ContractMap;
+    }
+
+    public static Map<String, Map<Integer, String>> getExchangeMap() {
+        return ExchangeMap;
+    }
+
+    public static Map<String, Map<Integer, String>> getHelpPageMap() {
+        return HelpPageMap;
+    }
+
+    public static PlayerWalletData getConsoleWallet() {
+        return ConsoleWallet;
+    }
+
+    public static Properties getProp() {
+        return prop;
+    }
+
+    public static CommandFilter getCommandFilter() {
+        return commandFilter;
+    }
+
+    public static ContainerListener getContainerListener() {
+        return containerListener;
+    }
+
+    public static InventoryCloseListener getInventoryCloseListener() {
+        return inventoryCloseListener;
+    }
+
+    public static SFTCommand getSftCommand() {
+        return sftCommand;
+    }
+
+    public static SFTListener getSftListener() {
+        return sftListener;
+    }
+
+    public static void setChainlibrary(BlockchainData chainlibrary) {
+        Main.chainlibrary = chainlibrary;
+    }
+
+    public static void setConn(Connection conn) {
+        Main.conn = conn;
+    }
+
+    public static void setConsoleWallet(PlayerWalletData consoleWallet) {
+        ConsoleWallet = consoleWallet;
+    }
+
+    public static void setERC20ContractMap(Map<String, Map<Integer, String>> ERC20ContractMap) {
+        Main.ERC20ContractMap = ERC20ContractMap;
+    }
+
+    public static void setExchangeMap(Map<String, Map<Integer, String>> exchangeMap) {
+        ExchangeMap = exchangeMap;
+    }
+
+    public static void setFileconfig(FileConfiguration fileconfig) {
+        Main.fileconfig = fileconfig;
+    }
+
+    public static void setFilecontract(FileConfiguration filecontract) {
+        Main.filecontract = filecontract;
+    }
+
+    public static void setFileexchange(FileConfiguration fileexchange) {
+        Main.fileexchange = fileexchange;
+    }
+
+    public static void setFilehelp(FileConfiguration filehelp) {
+        Main.filehelp = filehelp;
+    }
+
+    public static void setHelpPageMap(Map<String, Map<Integer, String>> helpPageMap) {
+        HelpPageMap = helpPageMap;
+    }
+
+    public static void setLegacyDirectory(File legacyDirectory) {
+        Main.legacyDirectory = legacyDirectory;
+    }
+
+    public static void setProp(Properties prop) {
+        Main.prop = prop;
+    }
+
+    public static void setCommandFilter(CommandFilter commandFilter) {
+        Main.commandFilter = commandFilter;
+    }
+
+    public static void setContainerListener(ContainerListener containerListener) {
+        Main.containerListener = containerListener;
+    }
+
+    public static void setInventoryCloseListener(InventoryCloseListener inventoryCloseListener) {
+        Main.inventoryCloseListener = inventoryCloseListener;
+    }
+
+    public static void setSftCommand(SFTCommand sftCommand) {
+        Main.sftCommand = sftCommand;
+    }
+
+    public static void setSftListener(SFTListener sftListener) {
+        Main.sftListener = sftListener;
     }
 }

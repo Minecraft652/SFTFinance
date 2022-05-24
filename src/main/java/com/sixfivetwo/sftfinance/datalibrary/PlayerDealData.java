@@ -127,4 +127,56 @@ public class PlayerDealData {
         }
         return list;
     }
+
+    public String getValue() {
+        return value;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public PlayerWalletData getFromid() {
+        return fromid;
+    }
+
+    public List<ItemStack> getDetails() {
+        return details;
+    }
+
+    public PlayerWalletData getToid() {
+        return toid;
+    }
+
+    public String getAllStrDetails() {
+        return allStrDetails;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
+
+    public void setToid(PlayerWalletData toid) {
+        this.toid = toid;
+    }
+
+    public void setFromid(PlayerWalletData fromid) {
+        this.fromid = fromid;
+    }
+
+    public void setAllStrDetails(String allStrDetails) {
+        this.allStrDetails = allStrDetails;
+    }
 }
