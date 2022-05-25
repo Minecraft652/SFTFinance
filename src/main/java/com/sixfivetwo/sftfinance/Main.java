@@ -210,6 +210,7 @@ public class Main extends JavaPlugin {
                     "".equals(fileconfig.getString("TradeAmountLimit")) ||
                     "".equals(fileconfig.getString("EnableCommandFilter")) ||
                     "".equals(fileconfig.getString("EnableErrorPrint")) ||
+                    "".equals(fileconfig.getString("EnableGeneralChecker")) ||
                     "".equals(fileconfig.getString("IsMysql")) ||
                     "".equals(fileconfig.getString("MysqlUrl")) ||
                     "".equals(fileconfig.getString("MysqlUser")) ||
@@ -230,6 +231,7 @@ public class Main extends JavaPlugin {
                     null == fileconfig.getString("TradeAmountLimit") ||
                     null == fileconfig.getString("EnableCommandFilter") ||
                     null == fileconfig.getString("EnableErrorPrint") ||
+                    null == fileconfig.getString("EnableGeneralChecker") ||
                     null == fileconfig.getString("IsMysql") ||
                     null == fileconfig.getString("MysqlUrl") ||
                     null == fileconfig.getString("MysqlUser") ||

@@ -196,6 +196,10 @@ public class SFTCommand implements CommandExecutor {
                                 }
                                 String Type = args[1];
                                 String Message = APILibrary.checkLegalExchange(Type, commander, commandSender, Main.ConsoleWallet.fromaddress);
+                                if (Message.equals("null")) {
+                                    APILibrary.playerSendMessage(commandSender, message);
+                                    return;
+                                }
                                 message.add(Main.SFTInfo + Main.prop.getProperty(Message));
                                 APILibrary.playerSendMessage(commandSender, message);
                                 return;
@@ -332,11 +336,13 @@ public class SFTCommand implements CommandExecutor {
                             }
                             if (args[0].equals("transfer")) {
                                 ReceiptData rd = new ReceiptData(args[1], "null", args[2], args[3], "null", String.valueOf(Main.chainlibrary.web3j.ethGasPrice().send().getGasPrice().divide(new BigInteger("1000000000"))));
-                                if (APILibrary.executeTransfer(commander, rd, commandSender)) return;
+                                APILibrary.executeTransfer(commander, rd, commandSender);
+                                return;
                             }
                             if (args[0].equals("approve")) {
                                 ReceiptData rd = new ReceiptData(args[1], "null", args[2], args[3], "null", String.valueOf(Main.chainlibrary.web3j.ethGasPrice().send().getGasPrice().divide(new BigInteger("1000000000"))));
-                                if (APILibrary.executeApprove(commander, rd, commandSender)) return;
+                                APILibrary.executeApprove(commander, rd, commandSender);
+                                return;
                             }
                             if (args[0].equals("trade")) {
                                 if (APILibrary.checkTradeAvailable(commandSender, commander)) return;
@@ -376,15 +382,18 @@ public class SFTCommand implements CommandExecutor {
                             }
                             if (args[0].equals("transfer")) {
                                 ReceiptData rd = new ReceiptData(args[1], "null", args[2], args[3], "null", args[4]);
-                                if (APILibrary.executeTransfer(commander, rd, commandSender)) return;
+                                APILibrary.executeTransfer(commander, rd, commandSender);
+                                return;
                             }
                             if (args[0].equals("transferfrom")) {
                                 ReceiptData rd = new ReceiptData(args[1], args[2], args[3], args[4], "null", String.valueOf(Main.chainlibrary.web3j.ethGasPrice().send().getGasPrice().divide(new BigInteger("1000000000"))));
-                                if (APILibrary.executeTransferFrom(commander, rd, commandSender)) return;
+                                APILibrary.executeTransferFrom(commander, rd, commandSender);
+                                return;
                             }
                             if (args[0].equals("approve")) {
                                 ReceiptData rd = new ReceiptData(args[1], "null", args[2], args[3], "null", args[4]);
-                                if (APILibrary.executeApprove(commander, rd, commandSender)) return;
+                                APILibrary.executeApprove(commander, rd, commandSender);
+                                return;
                             }
                             commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("Help"));
                             return;
@@ -395,22 +404,26 @@ public class SFTCommand implements CommandExecutor {
                             }
                             if (args[0].equals("transfer")) {
                                 ReceiptData rd = new ReceiptData(args[1], "null", args[2], args[3], args[5], args[4]);
-                                if (APILibrary.executeTransfer(commander, rd, commandSender)) return;
+                                APILibrary.executeTransfer(commander, rd, commandSender);
+                                return;
                             }
                             if (args[0].equals("transferfrom")) {
                                 ReceiptData rd = new ReceiptData(args[1], args[2], args[3], args[4], "null", args[5]);
-                                if (APILibrary.executeTransferFrom(commander, rd, commandSender)) return;
+                                APILibrary.executeTransferFrom(commander, rd, commandSender);
+                                return;
                             }
                             if (args[0].equals("approve")) {
                                 ReceiptData rd = new ReceiptData(args[1], "null", args[2], args[3], args[5], args[4]);
-                                if (APILibrary.executeApprove(commander, rd, commandSender)) return;
+                                APILibrary.executeApprove(commander, rd, commandSender);
+                                return;
                             }
                             commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("Help"));
                             return;
                         case 7:
                             if (args[0].equals("transferfrom")) {
                                 ReceiptData rd = new ReceiptData(args[1], args[2], args[3], args[4], args[6], args[5]);
-                                if (APILibrary.executeTransferFrom(commander, rd, commandSender)) return;
+                                APILibrary.executeTransferFrom(commander, rd, commandSender);
+                                return;
                             }
                             commandSender.sendMessage(Main.SFTInfo + Main.prop.getProperty("Help"));
                             return;
