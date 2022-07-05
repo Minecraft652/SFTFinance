@@ -40,6 +40,7 @@ https://github.com/Minecraft652
 
 ## 支持
 
+- 支持 PlaceHolderAPI。
 - 支持 MySQL , SQLite 数据库。
 - 支持自定义 ERC20 代币合约。
 - 支持兼容 EVM 的区块链及自定义区块链 HTTP 地址。
@@ -56,6 +57,14 @@ https://github.com/Minecraft652
 - 启动服务端，将会自动生成 config.yml 等文件
 - 插件目前只有在服务端关闭状态下才能进行配置
 - 配置完毕后，就可以正常使用。
+
+## 占位符
+
+- 想要打开占位符, 你需要在 config.yml 首先把 EnablePlaceHolderAPI: true 才能使用.
+- 还有 PlaceHolderAPI 插件. 你可以在 mcbbs, Github, SpigotMC 上找到它...
+- "COINSYMBOL" 作为下文中您当前代币的变量.
+- %sftfinance_address% - 你当前的钱包地址.
+- %sftfinance_"COINSYMBOL"balance% - 你当前的代币余额. 栗子: %sftfinance_BNBbalance% 是你的 BNB 余额.
 
 ## 命令
 
@@ -110,21 +119,27 @@ https://github.com/Minecraft652
 Java 版本 :
 
 - Java(TM) SE Runtime Environment (build 1.8.0_231-b11)
+- Java(TM) SE Runtime Environment (build 1.8.0_331-b09)
 - Java(TM) SE Runtime Environment 18.9 (build 11.0.12+8-LTS-237)
 
-Spigot 版本 : 
+服务器版本 : 
 
+- CraftBukkit version 3470-Spigot-ffceeae-1092219 (MC: 1.18.2) (Implementing API version 1.18.2-R0.1-SNAPSHOT)
 - CraftBukkit version 3096-Spigot-9fb885e-296df56 (MC: 1.16.5) (Implementing API version 1.16.5-R0.1-SNAPSHOT)
 - CraftBukkit version git-Spigot-21fe707-741a1bd (MC: 1.8.8) (Implementing API version 1.8.8-R0.1-SNAPSHOT)
 
 操作系统 : 
 
 - Microsoft Windows 10 2004
+- Microsoft Windows 11 21H2
 
 ## 作者想跟各位说的话
 
-- 这是我的第一个 Java 项目，如果您喜欢我的项目
+- 这是我的第一个 Java 项目，如果您喜欢我的项目...
 - 这是我的以太坊钱包地址 : 0x5b615F1a1989ee2636BfbFe471B1F66bCa16F926
 - 我是 Minecraft_652 一名热爱学习且致力于网络去中心化的程序猿。
 - 十分感谢您的支持！以下是我的联系方式：
-- QQ : 919899140 , Telegram : https://t.me/SIXFIVETWO
+- QQ : 919899140
+- Telegram : https://t.me/SIXFIVETWO
+- Twitter : https://twitter.com/Minecraft652
+- ENJOY TO USE :)

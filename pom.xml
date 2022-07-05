@@ -3,17 +3,22 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.sixfivetwo.sftfinance</groupId>
     <artifactId>SFTFinance</artifactId>
-    <version>Beta1.6.5.0</version>
+    <version>Release1.7.0</version>
     <properties>
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.source>1.8</maven.compiler.source>
     </properties>
     <repositories>
         <repository>
+            <id>placeholderapi</id>
+            <url>https://repo.extendedclip.com/content/repositories/placeholderapi/</url>
+        </repository>
+        <repository>
             <id>spigot-repo</id>
             <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
         </repository>
     </repositories>
+
     <build>
         <plugins>
             <plugin>
@@ -36,6 +41,13 @@
         </plugins>
     </build>
     <dependencies>
+        <!-- https://mvnrepository.com/artifact/me.clip/placeholderapi -->
+        <dependency>
+            <groupId>me.clip</groupId>
+            <artifactId>placeholderapi</artifactId>
+            <version>2.10.10</version>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>org.web3j</groupId>
             <artifactId>core</artifactId>
@@ -102,6 +114,7 @@
             <artifactId>mysql-connector-java</artifactId>
             <version>8.0.28</version>
         </dependency>
+
 
     </dependencies>
 

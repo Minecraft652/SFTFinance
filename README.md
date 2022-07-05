@@ -1,4 +1,4 @@
-# SFTFinance - Let your minecraft financial system be depolyed on blockchain.
+# SFTFinance - Let you experience blockchain transactions in Minecraft.
 
 ![](/banner.png)
 
@@ -41,6 +41,7 @@ THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR I
 
 ## Support
 
+- Support PlaceHolderAPI.
 - Support MySQL Database , SQLite.
 - Support custom ERC20 token contracts.
 - Support EVM compatible blockchain and custom BLOCKCHAIN HTTP address.
@@ -58,6 +59,14 @@ THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR I
 - If the server is started, files such as config.yml are automatically generated
 - Plugin can only be configured when the server is disabled
 - After the configuration is complete, it can be used normally.
+
+## PlaceHolders
+
+- To enable placeholders, You need enable this first in config.yml, EnablePlaceHolderAPI: true
+- And PlaceHolderAPI plugin. You can find it at Github, SpigotMC...
+- In here "COINSYMBOL" is your variable of tokens.
+- %sftfinance_address% - Your current wallet address.
+- %sftfinance_"COINSYMBOL"balance% - Your currect token balance. example: %sftfinance_BNBbalance% is your BNB balance...
 
 ## Command
 
@@ -101,9 +110,9 @@ THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR I
 
 ## Environment
 
-This software has no absolute version limits and is developed using the Spigot-1.17 API
+This software has no absolute version limits and is developed using the newest Spigot API.
 
-Here is the development environment (native support environment) in which this plug-in was tested
+Here is the development environment (native support environment) in which this plug-in was tested.
 
 If there are bugs and other problems, please put forward to me in Issues.
 
@@ -112,22 +121,27 @@ In addition to the following environment, other versions of the bug problem, ple
 Java version :
 
 - Java(TM) SE Runtime Environment (build 1.8.0_231-b11)
+- Java(TM) SE Runtime Environment (build 1.8.0_331-b09)
 - Java(TM) SE Runtime Environment 18.9 (build 11.0.12+8-LTS-237)
 
-Server version : 
+Server version :
 
+- CraftBukkit version 3470-Spigot-ffceeae-1092219 (MC: 1.18.2) (Implementing API version 1.18.2-R0.1-SNAPSHOT)
 - CraftBukkit version 3096-Spigot-9fb885e-296df56 (MC: 1.16.5) (Implementing API version 1.16.5-R0.1-SNAPSHOT)
 - CraftBukkit version git-Spigot-21fe707-741a1bd (MC: 1.8.8) (Implementing API version 1.8.8-R0.1-SNAPSHOT)
 
 Operating system : 
 
 - Microsoft Windows 10 2004
+- Microsoft Windows 11 21H2
 
 ## What the author wants to say to you
 
-- This is my first Java project, if you like my project
-- this is my ethereum address: 0x5b615f1a1989ee2636bfbfe471b1f66bca16f926
+- It's my first Java project, if you like my project...
+- This is my ethereum address: 0x5b615f1a1989ee2636bfbfe471b1f66bca16f926
 - I am Minecraft_652, a programmer who loves learning and is committed to network decentralization.
 - Thank you very much for your support! My contact information is as follows:
-- QQ : 919899140 , Telegram : https://t.me/SIXFIVETWO, Twitter : @Minecraft652
-- ENJOY TO USE! :Smile
+- QQ : 919899140
+- Telegram : https://t.me/SIXFIVETWO
+- Twitter : https://twitter.com/Minecraft652
+- ENJOY TO USE! :)
