@@ -407,12 +407,12 @@ public class APILibrary {
     public static String getVersion() {
         try {
             if (Objects.requireNonNull(Main.fileconfig.getString("Language")).contains("zh")) {
-                return Main.SFTInfo + "§a Beta1.6.5.1, 保留所有权利";
+                return Main.SFTInfo + "§a Release1.7.0, 保留所有权利";
             } else {
-                return Main.SFTInfo + "Beta1.6.5.1, all rights reserved";
+                return Main.SFTInfo + "Release1.7.0, all rights reserved";
             }
         } catch (Exception ex) {
-            return Main.SFTInfo + "Beta1.6.5.1, all rights reserved";
+            return Main.SFTInfo + "Release1.7.0, all rights reserved";
         }
     }
 
@@ -906,7 +906,7 @@ public class APILibrary {
                 BigInteger TxGasLimit = new BigInteger(gasLimit);
                 if (FromCurrentETHBalance.compareTo(TxGasLimit.multiply(TxGasPrice)) >= 0) {
                     if (ToCurrentBalance.compareTo(ToCurrentBalance.add(TxValue)) < 0) {
-                        if (TxValue.compareTo(FromCurrentBalance) < 0) {
+                        if (TxValue.compareTo(FromCurrentBalance) <= 0) {
                             return true;
                         }
                     }

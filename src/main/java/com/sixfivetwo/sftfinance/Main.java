@@ -1,9 +1,12 @@
 package com.sixfivetwo.sftfinance;
 
 import com.sixfivetwo.sftfinance.datalibrary.*;
+import com.sixfivetwo.sftfinance.expansion.PlaceHolderAPIExpansion;
 import com.sixfivetwo.sftfinance.listener.ContainerListener;
 import com.sixfivetwo.sftfinance.listener.InventoryCloseListener;
 import com.sixfivetwo.sftfinance.listener.SFTListener;
+import me.clip.placeholderapi.PlaceholderAPI;
+import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.apache.logging.log4j.LogManager;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -14,6 +17,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Map;
@@ -47,9 +51,9 @@ public class Main extends JavaPlugin {
     public void onEnable() {
 
         try {
-            ERC20ContractMap = new HashMap<>();
-            ExchangeMap = new HashMap<>();
-            HelpPageMap = new HashMap<>();
+            setERC20ContractMap(new HashMap<>());
+            setExchangeMap(new HashMap<>());
+            setHelpPageMap(new HashMap<>());
             Map<String, File> FileMaps = new HashMap<>();
             Map<String, InputStream> InternalFileMaps = new HashMap<>();
             File configfile = new File(getDataFolder(), "config.yml");
@@ -83,7 +87,7 @@ public class Main extends JavaPlugin {
             InternalFileMaps.put("en_US.properties", getResource("en_US.properties"));
             InternalFileMaps.put("ru_RU.properties", getResource("ru_RU.properties"));
 
-            legacyDirectory = new File(getDataFolder().toString() + "/Legacy");
+            setLegacyDirectory(new File(getDataFolder().toString() + "/Legacy"));
 
             if (!getDataFolder().exists()) {
                 getDataFolder().mkdir();
@@ -100,9 +104,9 @@ public class Main extends JavaPlugin {
                 }
             }
 
-            fileconfig = YamlConfiguration.loadConfiguration(configfile);
-            fileexchange = YamlConfiguration.loadConfiguration(exchangefile);
-            filecontract = YamlConfiguration.loadConfiguration(contractfile);
+            setFileconfig(YamlConfiguration.loadConfiguration(configfile));
+            setFileexchange(YamlConfiguration.loadConfiguration(exchangefile));
+            setFilecontract(YamlConfiguration.loadConfiguration(contractfile));
 
             for (String contractroot : filecontract.getKeys(false)) {
                 Map<Integer, String> FileMapContract = new HashMap<>();
@@ -130,8 +134,9 @@ public class Main extends JavaPlugin {
                 APILibrary.loadHelpFile(enhelpfile, HelpPageMap);
             }
 
-            prop = new Properties();
-            InputStream in = new FileInputStream(new File(getDataFolder(), fileconfig.getString("Language")));
+            setProp(new Properties());
+
+            InputStream in = Files.newInputStream(new File(getDataFolder(), fileconfig.getString("Language")).toPath());
             prop.load(in);
 
             try {
@@ -139,7 +144,7 @@ public class Main extends JavaPlugin {
                     String user = fileconfig.getString("MysqlUser");
                     String pass = fileconfig.getString("MysqlPassword");
                     String url = "jdbc:" + fileconfig.getString("MysqlUrl");
-                    conn = APILibrary.getConnection("mysql", url, user, pass);
+                    setConn(APILibrary.getConnection("mysql", url, user, pass));
                     if (Main.fileconfig.getBoolean("LegacyWalletGenerator")) {
                         APILibrary.legacyCreateWallet("00000000-0000-0000-0000-000000000000", "CONSOLE", Main.legacyDirectory);
                     } else {
@@ -150,7 +155,7 @@ public class Main extends JavaPlugin {
                     }
                 } else {
                     String url = "jdbc:sqlite:" + walletfile.toString();
-                    conn = APILibrary.getConnection("sqlite", url, "null", "null");
+                    setConn(conn = APILibrary.getConnection("sqlite", url, "null", "null"));
                     if (Main.fileconfig.getBoolean("LegacyWalletGenerator")) {
                         APILibrary.legacyCreateWallet("00000000-0000-0000-0000-000000000000", "CONSOLE", Main.legacyDirectory);
                     } else {
@@ -168,22 +173,22 @@ public class Main extends JavaPlugin {
                 System.out.println(Main.prop.getProperty("error"));
             }
 
-            chainlibrary = new BlockchainData(fileconfig.getString("ChainName"), fileconfig.getString("HttpUrl"), fileconfig.getLong("ChainID"), fileconfig.getString("Symbol"), APILibrary.getWeb3j(fileconfig.getString("HttpUrl")));
-            ConsoleWallet = new PlayerWalletData("CONSOLE");
+            setChainlibrary(new BlockchainData(fileconfig.getString("ChainName"), fileconfig.getString("HttpUrl"), fileconfig.getLong("ChainID"), fileconfig.getString("Symbol"), APILibrary.getWeb3j(fileconfig.getString("HttpUrl"))));
+            setConsoleWallet(new PlayerWalletData("CONSOLE"));
 
             if (fileconfig.getBoolean("OnPlayerLoginRegisterWallet")) {
-                sftListener = new SFTListener();
+                setSftListener(new SFTListener());
                 Bukkit.getServer().getPluginManager().registerEvents(sftListener, this);
             }
 
             if (fileconfig.getBoolean("playerCanTradeEachOther")) {
-                containerListener = new ContainerListener();
-                inventoryCloseListener = new InventoryCloseListener();
+                setContainerListener(new ContainerListener());
+                setInventoryCloseListener(new InventoryCloseListener());
                 Bukkit.getServer().getPluginManager().registerEvents(containerListener, this);
                 Bukkit.getServer().getPluginManager().registerEvents(inventoryCloseListener, this);
             }
 
-            sftCommand = new SFTCommand();
+            setSftCommand(new SFTCommand());
             Objects.requireNonNull(Bukkit.getPluginCommand("wallet")).setExecutor(sftCommand);
 
             if (Objects.requireNonNull(fileconfig.getString("Language")).contains("zh")) {
@@ -211,6 +216,7 @@ public class Main extends JavaPlugin {
                     "".equals(fileconfig.getString("EnableCommandFilter")) ||
                     "".equals(fileconfig.getString("EnableErrorPrint")) ||
                     "".equals(fileconfig.getString("EnableGeneralChecker")) ||
+                    "".equals(fileconfig.getString("EnablePlaceHolderAPI")) ||
                     "".equals(fileconfig.getString("IsMysql")) ||
                     "".equals(fileconfig.getString("MysqlUrl")) ||
                     "".equals(fileconfig.getString("MysqlUser")) ||
@@ -232,6 +238,7 @@ public class Main extends JavaPlugin {
                     null == fileconfig.getString("EnableCommandFilter") ||
                     null == fileconfig.getString("EnableErrorPrint") ||
                     null == fileconfig.getString("EnableGeneralChecker") ||
+                    null == fileconfig.getString("EnablePlaceHolderAPI") ||
                     null == fileconfig.getString("IsMysql") ||
                     null == fileconfig.getString("MysqlUrl") ||
                     null == fileconfig.getString("MysqlUser") ||
@@ -257,17 +264,24 @@ public class Main extends JavaPlugin {
                 Class.forName("org.apache.logging.log4j.core.filter.AbstractFilter");
                 org.apache.logging.log4j.core.Logger logger;
                 logger = (org.apache.logging.log4j.core.Logger) LogManager.getRootLogger();
-                commandFilter = new CommandFilter();
+                setCommandFilter(new CommandFilter());
                 logger.addFilter(commandFilter);
             }
 
             if (isReload) {
                 System.out.println(Main.SFTInfo + prop.getProperty("reload"));
                 theReloader.sendMessage(Main.SFTInfo + prop.getProperty("reload"));
-                isReload = false;
-                theReloader = null;
+                setReload(false);
+                setTheReloader(null);
             }
 
+            if (fileconfig.getBoolean("EnablePlaceHolderAPI")) {
+                if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+                    new PlaceHolderAPIExpansion().register();
+                } else {
+                    System.out.println(prop.getProperty("noplaceholderapi"));
+                }
+            }
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -281,29 +295,29 @@ public class Main extends JavaPlugin {
         }
         System.out.println(APILibrary.getVersion());
 
-        conn = null;
-        prop = null;
-        chainlibrary = null;
-        fileconfig = null;
-        filecontract = null;
-        filehelp = null;
-        fileexchange = null;
-        legacyDirectory = null;
-        ERC20ContractMap = null;
-        ExchangeMap = null;
-        HelpPageMap = null;
-        ConsoleWallet = null;
-        commandFilter = null;
-        containerListener = null;
-        inventoryCloseListener = null;
-        sftListener = null;
-        sftCommand = null;
+        setConn(null);
+        setProp(null);
+        setChainlibrary(null);
+        setFileconfig(null);
+        setFilecontract(null);
+        setFilehelp(null);
+        setFileexchange(null);
+        setLegacyDirectory(null);
+        setERC20ContractMap(null);
+        setExchangeMap(null);
+        setHelpPageMap(null);
+        setConsoleWallet(null);
+        setCommandFilter(null);
+        setContainerListener(null);
+        setInventoryCloseListener(null);
+        setSftCommand(null);
+        setSftListener(null);
         APILibrary.setBip44EthAccountZeroPath(null);
     }
 
     public void reloadWithCommand(CommandSender commandSender) {
-        isReload = true;
-        theReloader = commandSender;
+        setReload(true);
+        setTheReloader(commandSender);
         onDisable();
         onEnable();
     }
@@ -376,6 +390,15 @@ public class Main extends JavaPlugin {
         return sftListener;
     }
 
+    public CommandSender getTheReloader() {
+        return theReloader;
+    }
+
+
+    public boolean isReload() {
+        return isReload;
+    }
+
     public static void setChainlibrary(BlockchainData chainlibrary) {
         Main.chainlibrary = chainlibrary;
     }
@@ -442,5 +465,13 @@ public class Main extends JavaPlugin {
 
     public static void setSftListener(SFTListener sftListener) {
         Main.sftListener = sftListener;
+    }
+
+    public void setReload(boolean reload) {
+        isReload = reload;
+    }
+
+    public void setTheReloader(CommandSender theReloader) {
+        this.theReloader = theReloader;
     }
 }
