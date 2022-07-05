@@ -1,6 +1,7 @@
 name: SFTFinance
 main: com.sixfivetwo.sftfinance.Main
-version: Beta1.6.5.1
+version: Release1.7.0
+softdepend: [PlaceholderAPI]
 commands:
   wallet:
     aliases:

@@ -1,4 +1,4 @@
-Version: Beta1.7.0.0 #Version. 版本号
+Version: Release1.7.0 #Version. 版本号
 Language: en_US.properties #LanguageFile,Support English and chinese,chinese is zh_CN.properties. 语言文件，支持英文和中文，中文填 zh_CN.properties
 HttpUrl: https://data-seed-prebsc-1-s1.binance.org:8545/ #blockchain httpUrl. 区块链的HTTP和端口连接
 ExplorerUrl: §ahttps://testnet.bscscan.com/tx/ #Blockchain explorer url. 区块链浏览器的地址
@@ -8,8 +8,8 @@ ChainID: 97 #blockchain id 链id.
 OnPlayerLoginRegisterWallet: true #whether to create a wallet when the player logs in, true = yes. 是否在玩家登录时创建钱包，true为是
 LegacyWalletGenerator: false #Whether to enable legacy wallet generator, BIP39 Wallet. If you are in old minecraft version like 1.8. enable this true = yes. 是否使用老式生成方式生成钱包. true为是 如果你是老版本1.8出现了错误打开这个
 playerCanImportTheyOwnWallet: false #Whether to enable players to enter their own wallets, true = yes.是否允许玩家自行输入钱包. true为是
-playerCanTradeEachOther: true #whether to enable players to trade each others: /wallet trade, true = yes.是否允许玩家相互使用物品交易命令 /wallet trade ,true为是.
-TradeWorldLimit: true #whether to enable trade world limit. In list you cannot trade in that world. 是否开启交易世界限制如果开启，下列世界均无法使用交易功能.
+playerCanTradeEachOther: false #whether to enable players to trade each others: /wallet trade, true = yes.是否允许玩家相互使用物品交易命令 /wallet trade ,true为是.
+TradeWorldLimit: false #whether to enable trade world limit. In list you cannot trade in that world. 是否开启交易世界限制如果开启，下列世界均无法使用交易功能.
 LimitedWorld:
   - world
   - world_nether
