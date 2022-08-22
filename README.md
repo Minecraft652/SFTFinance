@@ -1,5 +1,11 @@
 # SFTFinance - Let you experience blockchain transactions in Minecraft.
 
+# Warning
+According to the Mojang's blockchain policy, this project is abandon. If you have something need any support, please contact the author.
+- QQ : 919899140
+- Telegram : https://t.me/SIXFIVETWO
+- Twitter : https://twitter.com/Minecraft652
+
 ![](/banner.png)
 
 [查看中文说明](/README_zh.md)
