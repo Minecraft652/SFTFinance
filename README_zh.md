@@ -2,9 +2,10 @@
 
 # 警告
 由于 Mojang 的区块链政策, 本项目已经废弃. 如需要任何支持请联系作者.
-QQ : 919899140
-Telegram : https://t.me/SIXFIVETWO
-Twitter : https://twitter.com/Minecraft652
+
+- QQ : 919899140
+- Telegram : https://t.me/SIXFIVETWO
+- Twitter : https://twitter.com/Minecraft652
 
 ![](/bannerzh.png)
 
