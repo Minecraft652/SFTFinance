@@ -2,7 +2,7 @@
 
 # Warning
 According to the Mojang's blockchain policy, this project is abandon. If you need any support, please contact the author.
-- QQ : 919899140
+- Discord: Minecraft_652
 - Telegram : https://t.me/SIXFIVETWO
 - Twitter : https://twitter.com/Minecraft652
 
