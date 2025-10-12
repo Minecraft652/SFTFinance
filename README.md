@@ -147,6 +147,6 @@ Operating system :
 - This is my ethereum address: 0x5b615f1a1989ee2636bfbfe471b1f66bca16f926
 - I am Minecraft_652, a programmer who loves learning and is committed to network decentralization.
 - Thank you very much for your support! My contact information is as follows:
-- Telegram : https://t.me/SIXFIVETWO
+- Telegram : https://t.me/MCSIXFIVETWO
 - Twitter : https://twitter.com/Minecraft652
 - ENJOY TO USE! :)
